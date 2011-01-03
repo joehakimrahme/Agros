@@ -16,7 +16,7 @@ typedef struct {		/* Struct to contain a parsed command */
 
 
 
-void parse_command(char *cmdline, command_t *cmd){ 
+void parse_command(char *cmdline, command_t *cmd){
     int argc = 0;
     char* word;
 
@@ -46,7 +46,7 @@ int read_input(char* string, int num){
     }else {
         return 0;
      }
-} 
+}
 
 void print_prompt(void){
     fprintf(stdout, "Enter Command$ ");
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
     int _pid = 0;
     command_t cmd;
     char* commandline;
-    
+
     while (1){
         print_prompt();
         read_input(commandline, MAX_LINE_LEN);
@@ -75,12 +75,12 @@ int main(int argc, char** argv){
 
         if (!strcmp(cmd.name, "exit"))
             break;
-    
+
         if (!strcmp(cmd.name, "?")){
             print_help();
             continue;
         }
-        
+
         pid = fork();
         if (pid == 0){
             execv(cmd.name, cmd.argv);
