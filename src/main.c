@@ -29,9 +29,10 @@ int main(int argc, char** argv){
         pid = fork();
         if (pid == 0){
             execv(cmd.name, cmd.argv);
-            printf("%s: Could not execute command!\n", cmd.name);
+            fprintf(stdout, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+            break;
         }else if (pid < 0){
-            printf("Error!\n");
+            fprintf(stdout, "Error!\n");
          }else {
             wait(0);
           }

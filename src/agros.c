@@ -42,5 +42,5 @@ void print_prompt(void){
 }
 
 void print_help(void){
-    fprintf(stdout, "Welcome to Agros, the newer limited shell.\n\tYou can type 'exit' to close the shell.\n\n\n");
+    fprintf(stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\n\n\n");
 }
