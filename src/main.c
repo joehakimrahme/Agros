@@ -21,6 +21,11 @@ int main(int argc, char** argv, char** envp){
         if (!strcmp(cmd.name, ""))
             continue;
 
+        if (!strcmp(cmd.name, "cd")){
+            change_directory(cmd.argv[1]);
+            continue;
+        }
+
         if (!strcmp(cmd.name, "?")){
             print_help();
             continue;

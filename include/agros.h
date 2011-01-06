@@ -13,3 +13,4 @@ void parse_command(char *cmdline, command_t *cmd);
 int read_input(char* string, int num);
 void print_prompt(void);
 void print_help(void);
+void change_directory(char* PATH);

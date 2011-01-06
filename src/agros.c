@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "agros.h"
 
 void parse_command(char *cmdline, command_t *cmd){
@@ -38,9 +39,17 @@ int read_input(char* string, int num){
 }
 
 void print_prompt(void){
-    fprintf(stdout, "Enter Command$ ");
+    fprintf(stdout, "%s@%s$ ", getenv("USERNAME"), getenv("PWD"));
 }
 
 void print_help(void){
     fprintf(stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\n\n\n");
+}
+
+void change_directory(char* PATH){
+    if (chdir(PATH) == 0){
+        setenv("PWD", PATH, 1);
+    }else{
+        fprintf(stdout, "%s: Could not change to such directory\n", PATH);
+    }
 }
