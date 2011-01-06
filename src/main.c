@@ -4,7 +4,7 @@
 #include "agros.h"
 
 
-int main(int argc, char** argv){
+int main(int argc, char** argv, char** envp){
     int pid = 0;
     int _pid = 0;
     command_t cmd;
@@ -28,7 +28,7 @@ int main(int argc, char** argv){
 
         pid = fork();
         if (pid == 0){
-            execv(cmd.name, cmd.argv);
+            execve(cmd.name, cmd.argv, envp);
             fprintf(stdout, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
             break;
         }else if (pid < 0){
