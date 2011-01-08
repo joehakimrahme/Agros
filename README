@@ -1,0 +1,32 @@
+##################################
+#  AGROS - The New Limited Shell #
+##################################
+    
+    AGROS is my implementation in C of the Limited Shell. It is an alternative for  
+    users who don't want to deal with the hassle of Python, lower performance,      
+    availability of the interpreter, and dealing with different versions. 
+    
+    This is why AGROS is rightfully named AGROS Got Rid Of the Snake. I'm pretty    
+    proud of that name :)
+    
+    The idea is to define in a conf file what commands the user can or cannot       
+    execute. It's a restrictive shell used for security puproses. 
+    
+    So far, as of version 0.0.2, I only have a shaky simplistic shell, so don't     
+    expect it to be working right away. I'm only writing this README because github 
+    asked me to :D
+
+
+
+Installation:
+#############
+
+    Simply run make. You can then launch the shell with ./agros.
+
+Contact
+#######
+    If you want to contribute to this project, please do not hesitate.
+    Since the project is still at its infancy, it'd be better if you contacted me   
+    at my email address:
+
+    Joe "rahmu" HAKIM RAHME <joe.hakim.rahme@gmail.com>
