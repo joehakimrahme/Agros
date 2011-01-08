@@ -8,7 +8,7 @@ int main(int argc, char** argv, char** envp){
     int pid = 0;
     int _pid = 0;
     command_t cmd;
-    char* commandline;
+    char commandline[MAX_LINE_LEN];
 
     while (1){
         print_prompt();
@@ -21,8 +21,9 @@ int main(int argc, char** argv, char** envp){
         if (!strcmp(cmd.name, ""))
             continue;
 
+
         if (!strcmp(cmd.name, "cd")){
-            change_directory(cmd.argv[1]);
+            change_directory(concat_spaces(cmd.argv));
             continue;
         }
 

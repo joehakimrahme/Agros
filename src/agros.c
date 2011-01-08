@@ -35,7 +35,7 @@ int read_input(char* string, int num){
         return 1;
     }else {
         return 0;
-     }
+    }
 }
 
 void print_prompt(void){
@@ -48,9 +48,22 @@ void print_help(void){
 
 void change_directory(char* PATH){
     if (chdir(PATH) == 0){
-        getcwd(PATH, 10000);
+        getcwd(PATH, MAX_LINE_LEN);
         setenv("PWD", PATH, 1);
     }else{
         fprintf(stdout, "%s: Could not change to such directory\n", PATH);
     }
+}
+
+char* concat_spaces (char** string_array){
+    char* tmp = string_array[1];
+    int count = 2;
+
+    while (string_array[count]){
+        strcat(tmp, " ");
+        strcat(tmp, string_array[count]);
+        count++;
+    }
+
+    return tmp;
 }
