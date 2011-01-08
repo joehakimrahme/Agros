@@ -48,6 +48,7 @@ void print_help(void){
 
 void change_directory(char* PATH){
     if (chdir(PATH) == 0){
+        getcwd(PATH, 10000);
         setenv("PWD", PATH, 1);
     }else{
         fprintf(stdout, "%s: Could not change to such directory\n", PATH);

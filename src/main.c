@@ -33,7 +33,7 @@ int main(int argc, char** argv, char** envp){
 
         pid = fork();
         if (pid == 0){
-            execve(cmd.name, cmd.argv, envp);
+            execvp(cmd.name, cmd.argv);
             fprintf(stdout, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
             break;
         }else if (pid < 0){
