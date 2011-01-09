@@ -4,6 +4,15 @@
 #include <unistd.h>
 #include "agros.h"
 
+//TODO: Replace size by dynamic allocation.
+built_in_commands my_commands[100] = {
+        {"exit" , EXIT_CMD  },
+        {""     , EMPTY_CMD },
+        {"cd"   , CD_CMD    },
+        {"?"    , HELP_CMD  }
+};
+
+
 void parse_command(char *cmdline, command_t *cmd){
     int argc = 0;
     char* word;
@@ -66,4 +75,14 @@ char* concat_spaces (char** string_array){
     }
 
     return tmp;
+}
+
+int get_cmd_code(char* cmd_name){
+    int i = 0;
+    for (i=0; i<100; i++){
+        if (!strcmp(my_commands[i].command_name, cmd_name)){
+            return my_commands[i].command_code;
+        }
+    }
+    return OTHER_CMD;
 }
