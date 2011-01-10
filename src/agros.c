@@ -1,10 +1,40 @@
+/*
+ *    AGROS - The new Limited Shell
+ *
+ *    Author: Joe "rahmu" Hakim Rahme <joe.hakim.rahme@gmail.com>
+ *
+ *
+ *    This file is part of AGROS.
+ *
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "agros.h"
 
-//TODO: Replace size by dynamic allocation.
+/*
+ * A global array holding the associations between each built-in command
+ * and their command_code. More explanations can be found in the declaration
+ * of the "built_in_commands" structure.
+ *
+ * TODO: Replace array size (100) by a dynamic allocation.
+ */
+
 built_in_commands my_commands[100] = {
         {"exit" , EXIT_CMD  },
         {""     , EMPTY_CMD },
@@ -12,6 +42,16 @@ built_in_commands my_commands[100] = {
         {"?"    , HELP_CMD  }
 };
 
+
+/*
+ * This function parses a string and fills a command_t struct.
+ * It uses the strtok() to split the string into tokens. Then it fills the argv
+ * array with the tokens.
+ *
+ * After filling the array, it copies argv[0] as the cmd->name and cmd->argc
+ * as the length of the array.
+ *
+ */
 
 void parse_command(char *cmdline, command_t *cmd){
     int argc = 0;
@@ -34,6 +74,11 @@ void parse_command(char *cmdline, command_t *cmd){
     strcpy(cmd->name, cmd->argv[0]);
 }
 
+
+/*
+ * Reads the input using fgets (don't use scanf!!!)
+ */
+
 int read_input(char* string, int num){
     char* CRPosition = NULL;
     if (fgets(string, num, stdin)){
@@ -47,13 +92,30 @@ int read_input(char* string, int num){
     }
 }
 
+
+/*
+ * Modifiy this function to modify the prompt
+ */
+
 void print_prompt(void){
     fprintf(stdout, "%s@%s$ ", getenv("USERNAME"), getenv("PWD"));
 }
 
+/*
+ * Prints the help message.
+ * TODO: Store my string messages (help + error messages) in a separate file.
+ */
+
 void print_help(void){
     fprintf(stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\n\n\n");
 }
+
+/*
+ * This command changes the current working directory used in the computation
+ * of relative paths. using the chdir() function.
+ * It then updates the $PWD environment variable with the new value of the current
+ * directory
+ */
 
 void change_directory(char* PATH){
     if (chdir(PATH) == 0){
@@ -63,6 +125,13 @@ void change_directory(char* PATH){
         fprintf(stdout, "%s: Could not change to such directory\n", PATH);
     }
 }
+
+/*
+ * This is used to send an argument to the CD command.
+ * It concatenates the arguments in case of a path containing a space character.
+ *
+ * TODO: This function should be updated to affect only parts of a global string.
+ */
 
 char* concat_spaces (char** string_array){
     char* tmp = string_array[1];
@@ -76,6 +145,12 @@ char* concat_spaces (char** string_array){
 
     return tmp;
 }
+
+/*
+ * This function access the global array variable my_commands
+ * and returns the command_code eauivalent to each command.
+ *
+ */
 
 int get_cmd_code(char* cmd_name){
     int i = 0;
