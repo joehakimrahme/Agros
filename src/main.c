@@ -31,7 +31,7 @@
 int main(int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd;
-    char commandline[MAX_LINE_LEN];
+    char* commandline;
 
     /*
      *   Main loop:
@@ -42,9 +42,7 @@ int main(int argc, char** argv, char** envp){
      */
 
     while (1){
-        print_prompt();
-
-        read_input(commandline, MAX_LINE_LEN);
+        commandline = ag_readline(return_prompt());
 
         parse_command(commandline, &cmd);
 

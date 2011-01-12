@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "agros.h"
 
 /*
@@ -77,6 +79,10 @@ void parse_command(char *cmdline, command_t *cmd){
 
 /*
  * Reads the input using fgets (don't use scanf!!!)
+ * DEPRECATED.
+ * DEPRECATED.
+ * DEPRECATED.
+ *
  */
 
 int read_input(char* string, int num){
@@ -97,8 +103,15 @@ int read_input(char* string, int num){
  * Modifiy this function to modify the prompt
  */
 
-void print_prompt(void){
-    fprintf(stdout, "[AGROS]%s:%s$ ", getenv("USERNAME"), getenv("PWD"));
+char* return_prompt(void){
+    char prompt[10000] = "[AGROS]";
+
+    strcat(prompt, getenv("USERNAME"));
+    strcat(prompt, ":");
+    strcat(prompt, getenv("PWD"));
+    strcat(prompt, "$ ");
+
+    return prompt;
 }
 
 /*
@@ -160,4 +173,26 @@ int get_cmd_code(char* cmd_name){
         }
     }
     return OTHER_CMD;
+}
+
+/*
+ * This is a wrapper for the GNU Readline function.
+ * Readline rocks! Thank you GNU!
+ *
+ */
+
+char* ag_readline(char* prompt){
+    static char *line_read = (char *)NULL;
+
+    if (line_read){
+        free (line_read);
+        line_read = (char *)NULL;
+    }
+
+    line_read = readline (prompt);
+
+    if (line_read && *line_read)
+      add_history (line_read);
+
+    return line_read;
 }
