@@ -98,7 +98,7 @@ int read_input(char* string, int num){
  */
 
 void print_prompt(void){
-    fprintf(stdout, "%s@%s$ ", getenv("USERNAME"), getenv("PWD"));
+    fprintf(stdout, "[AGROS]%s:%s$ ", getenv("USERNAME"), getenv("PWD"));
 }
 
 /*
