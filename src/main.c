@@ -67,10 +67,10 @@ int main(int argc, char** argv, char** envp){
                 pid = fork();
                 if (pid == 0){
                     execvp(cmd.name, cmd.argv);
-                    fprintf(stdout, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+                    fprintf(stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
                     break;
                 }else if (pid < 0){
-                    fprintf(stdout, "Error!\n");
+                    fprintf(stderr, "Error!\n");
                 }else {
                     wait(0);
                 }

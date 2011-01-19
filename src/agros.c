@@ -122,7 +122,7 @@ void change_directory(char* PATH){
         getcwd(PATH, MAX_LINE_LEN);
         setenv("PWD", PATH, 1);
     }else{
-        fprintf(stdout, "%s: Could not change to such directory\n", PATH);
+        fprintf(stderr, "%s: Could not change to such directory\n", PATH);
     }
 }
 
