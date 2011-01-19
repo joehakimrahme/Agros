@@ -74,8 +74,6 @@ int main(int argc, char** argv, char** envp){
                 }
                 break;
         }
-
-        if (pid == 0) {break;}
     }
     return 0;
 }
