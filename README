@@ -1,19 +1,29 @@
 ##################################
 #  AGROS - The New Limited Shell #
 ##################################
-    
-    AGROS is my implementation in C of the Limited Shell. It is an alternative for  
-    users who don't want to deal with the hassle of Python, lower performance,      
-    availability of the interpreter, and dealing with different versions. 
-    
-    This is why AGROS is rightfully named AGROS Got Rid Of the Snake. I'm pretty    
+
+    AGROS is my implementation in C of the Limited Shell (lshell). Lshell is a project
+    developed by ghantoos (mouzannar@gmail.com). The project consists of a UNIX shell
+    coded in Python, that restricts users to a set of predefined commands. You can find
+    the original project here:
+
+    http://lshell.ghantoos.org.
+
+    AGROS aims at implementing lshell in C. The idea being to get rid of certain
+    limitations of Python, namely:
+
+    - The availability of the Python interpreter on a machine.
+    - Versions management. (Lshell does not yet support Python 3)
+    - Performance issues, most notably on embedded systems.
+
+    This is why AGROS is rightfully named AGROS Got Rid Of the Snake. I'm pretty
     proud of that name :)
-    
-    The idea is to define in a conf file what commands the user can or cannot       
-    execute. It's a restrictive shell used for security puproses. 
-    
-    So far, as of version 0.0.2, I only have a shaky simplistic shell, so don't     
-    expect it to be working right away. I'm only writing this README because github 
+
+    The idea is to define in a conf file what commands the user can or cannot
+    execute. It's a restrictive shell used for security puproses.
+
+    So far, as of version 0.0.2, I only have a shaky simplistic shell, so don't
+    expect it to be working right away. I'm mainly writing this README because github
     asked me to :D
 
 
@@ -21,12 +31,20 @@
 Installation:
 #############
 
-    Simply run make. You can then launch the shell with ./agros.
+    Simply run make.
+
+    So far there are no dependencies to the shell, but I'm planning on adding libglib-2.0.0
+    as a first dependency to parse config files, and GNU Readline for better interactive
+    prompt. (Although first attempts at adding GNU Readlien weren't the most successful).
+
+    Once compiled, you can launch the shell with ./agros.
+
 
 Contact
 #######
+
     If you want to contribute to this project, please do not hesitate.
-    Since the project is still at its infancy, it'd be better if you contacted me   
+    Since the project is still at its infancy, it'd be better if you contacted me
     at my email address:
 
     Joe "rahmu" HAKIM RAHME <joe.hakim.rahme@gmail.com>
