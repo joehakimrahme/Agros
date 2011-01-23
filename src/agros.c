@@ -118,6 +118,15 @@ void print_help(void){
  */
 
 void change_directory(char* PATH){
+
+    /* Another abitrary size for arrays. I should really look into some hardcore malloc() */
+    char home[100] = "/home/";
+
+    if (PATH == NULL){
+        strcat(home, getenv("USERNAME"));
+        PATH = home;
+    }
+
     if (chdir(PATH) == 0){
         getcwd(PATH, MAX_LINE_LEN);
         setenv("PWD", PATH, 1);
