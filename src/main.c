@@ -24,7 +24,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "agros.h"
+
+#ifndef CONFIG_FILE
+#define CONFIG_FILE "agros.conf"
+#endif
 
 
 
@@ -32,6 +39,30 @@ int main(int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd;
     char commandline[MAX_LINE_LEN];
+
+/*
+ *  Testing GLib functionnalities
+ *
+
+    char* test = NULL;
+    GKeyFile* gkf;
+
+    gkf = g_key_file_new();
+    if (!g_key_file_load_from_file(gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
+        fprintf (stderr, "Could not read config file %s\n", CONFIG_FILE);
+        exit (EXIT_FAILURE);
+    }
+    test = g_key_file_get_string(gkf, "Allowed", "list", NULL);
+    if (test)
+        fprintf (stdout, "%s\n", test);
+    else
+        fprintf (stderr, "Error\n");
+
+
+    g_key_file_free (gkf);
+
+    fprintf (stdout, "%s\n", test);
+*/
 
     /*
      *   Main loop:
