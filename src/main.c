@@ -32,6 +32,7 @@ int main(int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd;
     char commandline[MAX_LINE_LEN];
+    int should_exit = 0;
 
     /*
      *   Main loop:
@@ -41,7 +42,7 @@ int main(int argc, char** argv, char** envp){
      *   - or a system command, in which case the program forks and executes it with execvp()
      */
 
-    while (1){
+    while (!should_exit){
         print_prompt();
 
         read_input(commandline, MAX_LINE_LEN);
@@ -68,14 +69,16 @@ int main(int argc, char** argv, char** envp){
                 if (pid == 0){
                     execvp(cmd.name, cmd.argv);
                     fprintf(stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+                    should_exit = 1;
                     break;
                 }else if (pid < 0){
-                    fprintf(stderr, "Error!\n");
+                    fprintf(stderr, "Error! ... Negative PID. God knows what that means ...\n");
                 }else {
                     wait(0);
                 }
                 break;
         }
     }
+    should_exit = 0;
     return 0;
 }
