@@ -41,30 +41,25 @@ int main(int argc, char** argv, char** envp){
     command_t cmd;
     char commandline[MAX_LINE_LEN];
     int should_exit = 0;
-
-/*
- *  Testing GLib functionnalities
- *
-
-    char* test = NULL;
+    int loglevel = 0;
     GKeyFile* gkf;
 
+    /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
+       Log file manipulations such as compressions, purging or backup are left for the user
+       to deal with. Until I find a better way to do it, that is :-) */
+    openlog("[AGROS]", LOG_CONS, LOG_USER);
+
+
+
+    /* Gets the value of loglevel, from CONFIG_FILE */
     gkf = g_key_file_new();
     if (!g_key_file_load_from_file(gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-        fprintf (stderr, "Could not read config file %s\n", CONFIG_FILE);
+        fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.", CONFIG_FILE);
+        syslog(LOG_USER, "<%s> Could not read config file. \n", getenv("USER"));
         exit (EXIT_FAILURE);
     }
-    test = g_key_file_get_string(gkf, "Allowed", "list", NULL);
-    if (test)
-        fprintf (stdout, "%s\n", test);
-    else
-        fprintf (stderr, "Error\n");
-
-
+    loglevel = g_key_file_get_integer(gkf, "General", "loglevel", NULL);
     g_key_file_free (gkf);
-
-    fprintf (stdout, "%s\n", test);
-*/
 
     /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
        Log file manipulations such as compressions, purging or backup are left for the user
@@ -104,7 +99,8 @@ int main(int argc, char** argv, char** envp){
                 if (pid == 0){
                     execvp(cmd.name, cmd.argv);
                     fprintf(stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                    syslog(LOG_USER, "<%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
+                    if (loglevel >= 2)
+                        syslog(LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
                     should_exit = 1;
                     break;
                 }else if (pid < 0){
