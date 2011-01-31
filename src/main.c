@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include "agros.h"
 
 
@@ -33,6 +34,12 @@ int main(int argc, char** argv, char** envp){
     command_t cmd;
     char commandline[MAX_LINE_LEN];
     int should_exit = 0;
+
+
+    /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
+       Log file manipulations such as compressions, purging or backup are left for the user
+       to deal with. Until I find a better way to do it, that is :-) */
+    openlog("[AGROS]", LOG_CONS, LOG_USER);
 
     /*
      *   Main loop:
@@ -44,9 +51,7 @@ int main(int argc, char** argv, char** envp){
 
     while (!should_exit){
         print_prompt();
-
         read_input(commandline, MAX_LINE_LEN);
-
         parse_command(commandline, &cmd);
 
         switch (get_cmd_code(cmd.name)){
@@ -69,6 +74,7 @@ int main(int argc, char** argv, char** envp){
                 if (pid == 0){
                     execvp(cmd.name, cmd.argv);
                     fprintf(stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+                    syslog(LOG_USER, "<%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
                     should_exit = 1;
                     break;
                 }else if (pid < 0){
@@ -79,6 +85,12 @@ int main(int argc, char** argv, char** envp){
                 break;
         }
     }
+
+    /* Temporary blah solution. This integer should be gotten rid of when dealing with signals. It sucks... */
     should_exit = 0;
+
+    /* Close your log when you're done. Always. */
+    closelog();
+
     return 0;
 }
