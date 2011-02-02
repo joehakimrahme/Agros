@@ -54,7 +54,7 @@ int main(int argc, char** argv, char** envp){
     /* Gets the value of loglevel, from CONFIG_FILE */
     gkf = g_key_file_new();
     if (!g_key_file_load_from_file(gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-        fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.", CONFIG_FILE);
+        fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
         syslog(LOG_USER, "<%s> Could not read config file. \n", getenv("USER"));
         exit (EXIT_FAILURE);
     }
