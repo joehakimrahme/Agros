@@ -68,10 +68,10 @@ struct command_t{
  *
  */
 
-void parse_command(char *cmdline, command_t *cmd);
-int read_input(char* string, int num);
-void print_prompt(void);
-void print_help(void);
-void change_directory(char* PATH);
-char* concat_spaces(char** string_array);
-int get_cmd_code(char* cmd_name);
+void  parse_command     (char *cmdline, command_t *cmd);
+int   read_input        (char* string, int num);
+void  print_prompt      (void);
+void  print_help        (void);
+void  change_directory  (char* PATH);
+char* concat_spaces     (char** string_array);
+int   get_cmd_code      (char* cmd_name);
