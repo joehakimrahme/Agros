@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <syslog.h>
 #include "agros.h"
 
 /*
@@ -117,7 +118,7 @@ void print_help(void){
  * directory
  */
 
-void change_directory (char* path){
+void change_directory (char* path, int loglevel){
 
     /* Another abitrary size for arrays. I should really look into some hardcore malloc() */
     char home[100] = "/home/";
@@ -132,6 +133,8 @@ void change_directory (char* path){
         setenv ("PWD", path, 1);
     }else{
         fprintf (stderr, "%s: Could not change to such directory\n", path);
+        if (loglevel >= 2)
+            syslog (LOG_USER, "#LGLVL2# <%s> Could not change to directory: %s. \n", getenv("USER"), path);
     }
 }
 
