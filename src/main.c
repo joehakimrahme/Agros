@@ -40,7 +40,6 @@ int main (int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd;
     char commandline[MAX_LINE_LEN];
-    int should_exit = 0;
     int loglevel = 0;
     GKeyFile* gkf;
 
@@ -73,7 +72,7 @@ int main (int argc, char** argv, char** envp){
      *   - or a system command, in which case the program forks and executes it with execvp()
      */
 
-    while (!should_exit){
+    while (1){
         print_prompt();
         read_input (commandline, MAX_LINE_LEN);
         parse_command (commandline, &cmd);
@@ -100,7 +99,7 @@ int main (int argc, char** argv, char** envp){
                     fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
                     if (loglevel >= 2)
                         syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
-                    should_exit = 1;
+                    kill(getpid(), SIGTERM);
                     break;
                 }else if (pid < 0){
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
@@ -110,9 +109,6 @@ int main (int argc, char** argv, char** envp){
                 break;
         }
     }
-
-    /* Temporary blah solution. This integer should be gotten rid of when dealing with signals. It sucks... */
-    should_exit = 0;
 
     /* Close your log when you're done. Always. */
     closelog();
