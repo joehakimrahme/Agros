@@ -90,6 +90,7 @@ int main (int argc, char** argv, char** envp){
                 break;
 
             case EXIT_CMD:
+                closelog();
                 return 0;
 
             case OTHER_CMD:
