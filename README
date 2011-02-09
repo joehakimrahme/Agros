@@ -27,6 +27,15 @@
     asked me to :D
 
 
+Dependencies:
+############
+
+    These are available as packaged binaries for Debian. I haven't tried them on
+    other Unices.
+
+    * pkg-config
+    * libglib2.0-dev
+
 
 Installation:
 #############
