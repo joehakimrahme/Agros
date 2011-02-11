@@ -42,22 +42,32 @@ int main (int argc, char** argv, char** envp){
     char commandline[MAX_LINE_LEN];
     int loglevel = 0;
     GKeyFile* gkf;
+    char** allowedList;
+    gsize allowed_nbr = 0;
 
-    /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
-       Log file manipulations such as compressions, purging or backup are left for the user
-       to deal with. Until I find a better way to do it, that is :-) */
+
+
+    /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues
+       like compression, archiving and purging */
     openlog ("[AGROS]", LOG_CONS, LOG_USER);
 
 
-    /* Gets the value of loglevel, from CONFIG_FILE */
+
+
+    /* Gets the data from CONFIG_FILE */
     gkf = g_key_file_new();
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
         fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
         syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER"));
         exit (EXIT_FAILURE);
     }
+
     loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
+    allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
+
     g_key_file_free (gkf);
+
+
 
     /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
        Log file manipulations such as compressions, purging or backup are left for the user
@@ -96,16 +106,20 @@ int main (int argc, char** argv, char** envp){
             case OTHER_CMD:
                 pid = fork();
                 if (pid == 0){
-                    execvp (cmd.name, cmd.argv);
-                    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                    if (loglevel >= 2)
-                        syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
+                    if (!check_validity (&cmd, allowedList)){
+                        execvp (cmd.name, cmd.argv);
+                        fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+                        if (loglevel >= 2)
+                            syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
+                    }else
+                        fprintf (stdout, "Not allowed! \n");
+
                     kill(getpid(), SIGTERM);
                     break;
                 }else if (pid < 0){
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
                 }else {
-                    wait(0);
+                    wait (0);
                 }
                 break;
         }

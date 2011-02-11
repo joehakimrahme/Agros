@@ -82,7 +82,7 @@ void parse_command (char *cmdline, command_t *cmd){
 
 int read_input (char* string, int num){
     char* CRPosition = NULL;
-    if (fgets(string, num, stdin)){
+    if (fgets (string, num, stdin)){
         CRPosition = strchr (string, '\n');
         if (CRPosition){
             *CRPosition = '\0';
@@ -101,12 +101,12 @@ int read_input (char* string, int num){
 void print_prompt (void){
     char* username = NULL;
 
-    if (getenv("USERNAME"))
-        username = getenv("USERNAME");
+    if (getenv ("USERNAME"))
+        username = getenv ("USERNAME");
     else
-        username = getenv("USER");
+        username = getenv ("USER");
 
-    fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv("PWD"));
+    fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
 }
 
 /*
@@ -174,9 +174,29 @@ char* concat_spaces (char** string_array){
 int get_cmd_code (char* cmd_name){
     int i = 0;
     for (i=0; i<100; i++){
-        if (!strcmp(my_commands[i].command_name, cmd_name)){
+        if (!strcmp (my_commands[i].command_name, cmd_name)){
             return my_commands[i].command_code;
         }
     }
     return OTHER_CMD;
+}
+
+/*
+ * This function checks for the validity of user input.
+ * allowedList is an array of strings, the only commands
+ * allowed to use.
+ *
+ */
+
+int check_validity (command_t* cmd, char** allowed){
+    int valid = 1;
+    int i = 0;
+
+    while (allowed[i]){
+        if (!strcmp (allowed[i], cmd->name))
+            valid = 0;
+        i++;
+    }
+
+    return valid;
 }
