@@ -89,6 +89,10 @@ int main (int argc, char** argv, char** envp){
                 print_help();
                 break;
 
+            case ENV_CMD:
+                print_env (cmd.argv[1]);
+                break;
+
             case EXIT_CMD:
                 closelog();
                 return 0;

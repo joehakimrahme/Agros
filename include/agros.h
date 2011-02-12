@@ -29,7 +29,8 @@
 #define EMPTY_CMD   1
 #define CD_CMD      2
 #define HELP_CMD    3
-#define EXIT_CMD    4
+#define ENV_CMD     4
+#define EXIT_CMD    5
 
 
 /*
@@ -75,3 +76,4 @@ void  print_help        (void);
 void  change_directory  (char* path, int loglevel);
 char* concat_spaces     (char** string_array);
 int   get_cmd_code      (char* cmd_name);
+void  print_env         (char* env_variable);

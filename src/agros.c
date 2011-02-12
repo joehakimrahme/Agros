@@ -40,9 +40,15 @@ built_in_commands my_commands[100] = {
         {"exit" , EXIT_CMD  },
         {""     , EMPTY_CMD },
         {"cd"   , CD_CMD    },
+        {"env"  , ENV_CMD   },
         {"?"    , HELP_CMD  }
 };
 
+
+
+/* This variable contains the environment. I use it in my "env" built-in
+   function */
+extern char** environ;
 
 /*
  * This function parses a string and fills a command_t struct.
@@ -179,4 +185,21 @@ int get_cmd_code (char* cmd_name){
         }
     }
     return OTHER_CMD;
+}
+
+void print_env (char* env_variable){
+    char* env_value = NULL;
+    char** var = NULL;
+
+    if (env_variable != NULL){
+        env_value = getenv(env_variable);
+        if (env_value)
+            fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
+        else
+            fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
+    }else {
+        for (var = environ; *var != NULL; ++var)
+            fprintf (stdout, "%s\n", *var);
+    }
+
 }
