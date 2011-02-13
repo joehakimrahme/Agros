@@ -92,7 +92,7 @@ int main (int argc, char** argv, char** envp){
                 break;
 
             case CD_CMD:
-                change_directory (concat_spaces(cmd.argv), loglevel);
+                change_directory (cmd.argv[1], loglevel);
                 break;
 
             case HELP_CMD:

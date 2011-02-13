@@ -146,26 +146,6 @@ void change_directory (char* path, int loglevel){
 }
 
 /*
- * This is used to send an argument to the CD command.
- * It concatenates the arguments in case of a path containing a space character.
- *
- * TODO: This function should be updated to affect only parts of a global string.
- */
-
-char* concat_spaces (char** string_array){
-    char* tmp = string_array[1];
-    int count = 2;
-
-    while (string_array[count]){
-        strcat (tmp, " ");
-        strcat (tmp, string_array[count]);
-        count++;
-    }
-
-    return tmp;
-}
-
-/*
  * This function access the global array variable my_commands
  * and returns the command_code eauivalent to each command.
  *
