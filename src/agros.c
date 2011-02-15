@@ -101,7 +101,12 @@ int read_input (char* string, int num){
 
 
 /*
- * Modifiy this function to modify the prompt
+ * Modifiy this function to modify the prompt. Ultimately, I want to define the prompt
+ * inside the conf file à la bash.
+ *
+ * Note that when I switched from Ubuntu to Crunchbang (another Debian-based) "USERNAME"
+ * was not defined anymore in the environment, but "USER" was. Hence the wierd if.
+ *
  */
 
 void print_prompt (void){
