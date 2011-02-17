@@ -26,6 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <syslog.h>
+#include <assert.h>
 #include "agros.h"
 
 /*
@@ -115,6 +116,7 @@ void print_prompt (void){
     else
         username = getenv ("USER");
 
+    assert (username != NULL);
 
     fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
 }
