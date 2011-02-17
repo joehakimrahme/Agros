@@ -22,9 +22,16 @@
     The idea is to define in a conf file what commands the user can or cannot
     execute. It's a restrictive shell used for security puproses.
 
-    So far, as of version 0.0.2, I only have a shaky simplistic shell, so don't
-    expect it to be working right away. I'm mainly writing this README because github
-    asked me to :D
+
+Version 0.1:
+############
+    * Release Date: 17/02/2011
+    * Built-in functions:
+        - cd
+        - ?
+        - env
+        - exit
+    * Using execvp() for process execution
 
 
 Dependencies:
@@ -48,6 +55,13 @@ Installation:
 
     Once compiled, you can launch the shell with ./agros.
 
+
+Configuration:
+##############
+
+    So far there is only one variable to define in the configuration agros.conf.
+    Set the "allowed" array to a list of allowed commands in the shell. Separator should be ";"
+    and make sure to leave no spaces between different items.
 
 Contact
 #######
