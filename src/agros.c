@@ -61,7 +61,7 @@ extern char** environ;
  */
 
 void parse_command (char *cmdline, command_t *cmd){
-    int argc = 0;
+    int count = 0;
     char* word;
 
     word = strtok (cmdline, WHITESPACE);
@@ -69,14 +69,13 @@ void parse_command (char *cmdline, command_t *cmd){
     if (word == NULL) { word = ""; } // Fixes blank line bug
 
     while (word) {
-        cmd->argv[argc] = (char *) malloc (strlen (word)+1);
-        strcpy (cmd->argv[argc], word);
+        cmd->argv[count] = word;
         word = strtok (NULL, WHITESPACE);
-        argc++;
+        count++;
     }
-    cmd->argv[argc] = NULL;
+    cmd->argv[count] = NULL;
 
-    cmd->argc = argc;
+    cmd->argc = count;
     cmd->name = (char *) malloc (strlen (cmd->argv[0])+1);
     strcpy (cmd->name, cmd->argv[0]);
 }
@@ -104,8 +103,7 @@ int read_input (char* string, int num){
  * Modifiy this function to modify the prompt. Ultimately, I want to define the prompt
  * inside the conf file à la bash.
  *
- * Note that when I switched from Ubuntu to Crunchbang (another Debian-based) "USERNAME"
- * was not defined anymore in the environment, but "USER" was. Hence the wierd if.
+ * Some systems use USERNAME, others use USER. Hence the ugly if.
  *
  */
 
@@ -116,6 +114,7 @@ void print_prompt (void){
         username = getenv ("USERNAME");
     else
         username = getenv ("USER");
+
 
     fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
 }
