@@ -126,8 +126,9 @@ void print_prompt (void){
  * TODO: Store my string messages (help + error messages) in a separate file.
  */
 
-void print_help(void){
-    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\n\n\n");
+void print_help(char** allowed){
+    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\nList of allowed actions:\n");
+    print_allowed(allowed);
 }
 
 /*
@@ -210,5 +211,18 @@ void print_env (char* env_variable){
     }else {
         for (var = environ; *var != NULL; ++var)
             fprintf (stdout, "%s\n", *var);
+    }
+}
+
+/*
+ * Prints the list of allowed commands. Used in the print_help() function
+ *
+ */
+
+void print_allowed (char** allowed){
+    int i=0;
+    while (allowed[i]){
+        fprintf (stdout, " * %s\n", allowed[i]);
+        i++;
     }
 }

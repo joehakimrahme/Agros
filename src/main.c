@@ -65,6 +65,21 @@ int main (int argc, char** argv, char** envp){
     loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
     allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
 
+
+
+
+    /*
+     * That's my discusting way of saying: "Let's keep logging aside for the moment,
+     * I need to deliver v0.1"
+     *
+     */
+
+    loglevel = 0;
+
+    /* Remeber to delete the above call. Please */
+
+
+
     g_key_file_free (gkf);
 
 
@@ -96,7 +111,7 @@ int main (int argc, char** argv, char** envp){
                 break;
 
             case HELP_CMD:
-                print_help();
+                print_help(allowedList);
                 break;
 
             case ENV_CMD:
