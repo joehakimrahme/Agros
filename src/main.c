@@ -59,7 +59,7 @@ int main (int argc, char** argv, char** envp){
     gkf = g_key_file_new();
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
         fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-       // syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER"));
+       /* syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER")); */
         exit (EXIT_FAILURE);
     }
 
@@ -79,8 +79,9 @@ int main (int argc, char** argv, char** envp){
     loglevel = 0;
 
     /* Remeber to delete the above call. Please */
-
-    fprintf (stdout, "\n%s\n\n", welcomeMessage);
+    if (welcomeMessage!=NULL) {
+        fprintf (stdout, "\n%s\n\n", welcomeMessage);
+    }
 
     g_key_file_free (gkf);
 
