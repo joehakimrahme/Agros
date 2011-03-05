@@ -46,9 +46,6 @@ int main (int argc, char** argv, char** envp){
     gsize allowed_nbr = 0;
 
     gchar* welcomeMessage = NULL;
-    gchar* welcome_group = "Welcome";
-    gchar* welcome_key = "welcome";
-
 
 
     /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues
@@ -62,13 +59,13 @@ int main (int argc, char** argv, char** envp){
     gkf = g_key_file_new();
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
         fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-        syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER"));
+       // syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER"));
         exit (EXIT_FAILURE);
     }
 
     loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
     allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
-    welcomeMessage = g_key_file_get_string(gkf,welcome_group,welcome_key,NULL);
+    welcomeMessage = g_key_file_get_string (gkf, "General", "welcome", NULL);
 
 
 
@@ -83,8 +80,8 @@ int main (int argc, char** argv, char** envp){
 
     /* Remeber to delete the above call. Please */
 
-    fprintf(stdout,"\n\n\t\t\t\t\t%s\n\n",welcomeMessage);
-    
+    fprintf (stdout, "\n%s\n\n", welcomeMessage);
+
     g_key_file_free (gkf);
 
 
