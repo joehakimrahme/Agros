@@ -24,68 +24,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <syslog.h>
 #include "agros.h"
-
-#ifndef CONFIG_FILE
-#define CONFIG_FILE "agros.conf"
-#endif
-
 
 
 int main (int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd = {NULL, 0, {NULL}};
     char commandline[MAX_LINE_LEN];
+
+    /* Configuration file parameters */
+    char** allowedList = NULL;
+    int allowed_nbr = 0;
+    char* welcomeMessage = NULL;
     int loglevel = 0;
-    GKeyFile* gkf;
-    char** allowedList;
-    gsize allowed_nbr = 0;
 
-    gchar* welcomeMessage = NULL;
-
-
-    /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues
-       like compression, archiving and purging */
-    openlog ("[AGROS]", LOG_CONS, LOG_USER);
-
-
-
-
-    /* Gets the data from CONFIG_FILE */
-    gkf = g_key_file_new();
-    if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-        fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-       /* syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER")); */
-        exit (EXIT_FAILURE);
-    }
-
-    loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
-    allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
-    welcomeMessage = g_key_file_get_string (gkf, "General", "welcome", NULL);
-
-
-
-
-    /*
-     * That's my discusting way of saying: "Let's keep logging aside for the moment,
-     * I need to deliver v0.1"
-     *
-     */
-
-    loglevel = 0;
-
-    /* Remeber to delete the above call. Please */
-    if (welcomeMessage!=NULL) {
-        fprintf (stdout, "\n%s\n\n", welcomeMessage);
-    }
-
-    g_key_file_free (gkf);
-
-
+    parse_config(allowedList,&allowed_nbr,welcomeMessage,&loglevel);
 
     /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
        Log file manipulations such as compressions, purging or backup are left for the user

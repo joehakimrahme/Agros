@@ -27,7 +27,12 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <assert.h>
+#include <glib.h>
 #include "agros.h"
+
+#ifndef CONFIG_FILE
+#define CONFIG_FILE "agros.conf"
+#endif
 
 /*
  * A global array holding the associations between each built-in command
@@ -226,3 +231,38 @@ void print_allowed (char** allowed){
         i++;
     }
 }
+
+void parse_config (char** allowedList,int* allowed_nbr,char* welcomeMessage,int* loglevel){
+    GKeyFile* gkf;
+
+    /* Gets the data from CONFIG_FILE */
+    gkf = g_key_file_new();
+
+    if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
+        fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
+	/* syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER")); */
+        exit (EXIT_FAILURE);
+    }
+
+    loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
+    allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
+    welcomeMessage = g_key_file_get_string (gkf, "General", "welcome", NULL);
+
+    /*
+     * That's my discusting way of saying: "Let's keep logging aside for the moment,
+     * I need to deliver v0.1"
+     *
+     */
+
+    loglevel = 0;
+
+    /* Remeber to delete the above call. Please */
+
+
+    if (welcomeMessage!=NULL) {
+        fprintf (stdout, "\n%s\n\n", welcomeMessage);
+    }
+
+    g_key_file_free (gkf);
+}
+
