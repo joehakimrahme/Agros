@@ -8,6 +8,8 @@ CFLAGS=-Wall
 # Modify the format to suit gcc
 ifdef SYSCONFDIR
     SYSCONF=\"$(SYSCONFDIR)/agros.conf\"
+else 
+    SYSCONF=\"$(CURDIR)/agros.conf\"
 endif
 
 
