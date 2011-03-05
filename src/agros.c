@@ -43,11 +43,11 @@
  */
 
 built_in_commands my_commands[100] = {
-        {"exit" , EXIT_CMD  },
-        {""     , EMPTY_CMD },
-        {"cd"   , CD_CMD    },
-        {"env"  , ENV_CMD   },
-        {"?"    , HELP_CMD  }
+  {"exit" , EXIT_CMD  },
+  {""     , EMPTY_CMD },
+  {"cd"   , CD_CMD    },
+  {"env"  , ENV_CMD   },
+  {"?"    , HELP_CMD  }
 };
 
 
@@ -67,23 +67,23 @@ extern char** environ;
  */
 
 void parse_command (char *cmdline, command_t *cmd){
-    int count = 0;
-    char* word;
+  int count = 0;
+  char* word;
 
-    word = strtok (cmdline, WHITESPACE);
+  word = strtok (cmdline, WHITESPACE);
 
-    if (word == NULL) { word = ""; } // Fixes blank line bug
+  if (word == NULL) { word = ""; } // Fixes blank line bug
 
-    while (word) {
-        cmd->argv[count] = word;
-        word = strtok (NULL, WHITESPACE);
-        count++;
-    }
-    cmd->argv[count] = NULL;
+  while (word) {
+    cmd->argv[count] = word;
+    word = strtok (NULL, WHITESPACE);
+    count++;
+  }
+  cmd->argv[count] = NULL;
 
-    cmd->argc = count;
-    cmd->name = (char *) malloc (strlen (cmd->argv[0])+1);
-    strcpy (cmd->name, cmd->argv[0]);
+  cmd->argc = count;
+  cmd->name = (char *) malloc (strlen (cmd->argv[0])+1);
+  strcpy (cmd->name, cmd->argv[0]);
 }
 
 
@@ -92,16 +92,16 @@ void parse_command (char *cmdline, command_t *cmd){
  */
 
 int read_input (char* string, int num){
-    char* CRPosition = NULL;
-    if (fgets (string, num, stdin)){
-        CRPosition = strchr (string, '\n');
-        if (CRPosition){
-            *CRPosition = '\0';
-        }
-        return 1;
-    }else {
-        return 0;
+  char* CRPosition = NULL;
+  if (fgets (string, num, stdin)){
+    CRPosition = strchr (string, '\n');
+    if (CRPosition){
+      *CRPosition = '\0';
     }
+    return 1;
+  }else {
+    return 0;
+  }
 }
 
 
@@ -114,16 +114,16 @@ int read_input (char* string, int num){
  */
 
 void print_prompt (void){
-    char* username = NULL;
+  char* username = NULL;
 
-    if (getenv ("USERNAME"))
-        username = getenv ("USERNAME");
-    else
-        username = getenv ("USER");
+  if (getenv ("USERNAME"))
+    username = getenv ("USERNAME");
+  else
+    username = getenv ("USER");
 
-    assert (username != NULL);
+  assert (username != NULL);
 
-    fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
+  fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
 }
 
 /*
@@ -132,8 +132,8 @@ void print_prompt (void){
  */
 
 void print_help(char** allowed){
-    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\nList of allowed actions:\n");
-    print_allowed(allowed);
+  fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\nList of allowed actions:\n");
+  print_allowed(allowed);
 }
 
 /*
@@ -145,22 +145,22 @@ void print_help(char** allowed){
 
 void change_directory (char* path, int loglevel){
 
-    /* Another abitrary size for arrays. I should really look into some hardcore malloc() */
-    char home[100] = "/home/";
+  /* Another abitrary size for arrays. I should really look into some hardcore malloc() */
+  char home[100] = "/home/";
 
-    if (path == NULL){
-        strcat (home, getenv("USERNAME"));
-        path = home;
-    }
+  if (path == NULL){
+    strcat (home, getenv("USERNAME"));
+    path = home;
+  }
 
-    if (chdir (path) == 0){
-        getcwd (path, MAX_LINE_LEN);
-        setenv ("PWD", path, 1);
-    }else{
-        fprintf (stderr, "%s: Could not change to such directory\n", path);
-        if (loglevel >= 2)
-            syslog (LOG_USER, "#LGLVL2# <%s> Could not change to directory: %s. \n", getenv("USER"), path);
-    }
+  if (chdir (path) == 0){
+    getcwd (path, MAX_LINE_LEN);
+    setenv ("PWD", path, 1);
+  }else{
+    fprintf (stderr, "%s: Could not change to such directory\n", path);
+    if (loglevel >= 2)
+      syslog (LOG_USER, "#LGLVL2# <%s> Could not change to directory: %s. \n", getenv("USER"), path);
+  }
 }
 
 /*
@@ -170,13 +170,13 @@ void change_directory (char* path, int loglevel){
  */
 
 int get_cmd_code (char* cmd_name){
-    int i = 0;
-    for (i=0; i<100; i++){
-        if (!strcmp (my_commands[i].command_name, cmd_name)){
-            return my_commands[i].command_code;
-        }
+  int i = 0;
+  for (i=0; i<100; i++){
+    if (!strcmp (my_commands[i].command_name, cmd_name)){
+      return my_commands[i].command_code;
     }
-    return OTHER_CMD;
+  }
+  return OTHER_CMD;
 }
 
 /*
@@ -187,15 +187,15 @@ int get_cmd_code (char* cmd_name){
  */
 
 int check_validity (command_t* cmd, char** allowed){
-    int valid = 1;
-    int i = 0;
+  int valid = 1;
+  int i = 0;
 
-    while (allowed[i]){
-        if (!strcmp (allowed[i], cmd->name))
-            valid = 0;
-        i++;
-    }
-    return valid;
+  while (allowed[i]){
+    if (!strcmp (allowed[i], cmd->name))
+      valid = 0;
+    i++;
+  }
+  return valid;
 }
 
 /* 
@@ -204,19 +204,19 @@ int check_validity (command_t* cmd, char** allowed){
  */
 
 void print_env (char* env_variable){
-    char* env_value = NULL;
-    char** var = NULL;
+  char* env_value = NULL;
+  char** var = NULL;
 
-    if (env_variable != NULL){
-        env_value = getenv(env_variable);
-        if (env_value)
-            fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
-        else
-            fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
-    }else {
-        for (var = environ; *var != NULL; ++var)
-            fprintf (stdout, "%s\n", *var);
-    }
+  if (env_variable != NULL){
+    env_value = getenv(env_variable);
+    if (env_value)
+      fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
+    else
+      fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
+  }else {
+    for (var = environ; *var != NULL; ++var)
+      fprintf (stdout, "%s\n", *var);
+  }
 }
 
 /*
@@ -225,44 +225,38 @@ void print_env (char* env_variable){
  */
 
 void print_allowed (char** allowed){
-    int i=0;
-    while (allowed[i]){
-        fprintf (stdout, " * %s\n", allowed[i]);
-        i++;
-    }
+  int i=0;
+  while (allowed[i]){
+    fprintf (stdout, " * %s\n", allowed[i]);
+    i++;
+  }
 }
 
-void parse_config (char** allowedList,int* allowed_nbr,char* welcomeMessage,int* loglevel){
-    GKeyFile* gkf;
+void parse_config (char** allowedList, int* allowed_nbr, char* welcomeMessage, int* loglevel){
+  GKeyFile* gkf;
 
-    /* Gets the data from CONFIG_FILE */
-    gkf = g_key_file_new();
+  /* Gets the data from CONFIG_FILE */
+  gkf = g_key_file_new();
 
-    if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-        fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-	/* syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER")); */
-        exit (EXIT_FAILURE);
-    }
+  if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
+    fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
+    /* syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER")); */
+    exit (EXIT_FAILURE);
+  }
 
-    loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
-    allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
-    welcomeMessage = g_key_file_get_string (gkf, "General", "welcome", NULL);
+  loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
+  allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
+  welcomeMessage = g_key_file_get_string (gkf, "General", "welcome", NULL);
 
-    /*
-     * That's my discusting way of saying: "Let's keep logging aside for the moment,
-     * I need to deliver v0.1"
-     *
-     */
+  /*
+   * That's my disgusting way of saying: "Let's keep logging aside for the moment,
+   * I need to deliver v0.1"
+   *
+   */
 
-    loglevel = 0;
+  loglevel = 0;
 
-    /* Remeber to delete the above call. Please */
+  /* Remember to delete the above call. Please */
 
-
-    if (welcomeMessage!=NULL) {
-        fprintf (stdout, "\n%s\n\n", welcomeMessage);
-    }
-
-    g_key_file_free (gkf);
+  g_key_file_free (gkf);
 }
-
