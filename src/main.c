@@ -65,44 +65,44 @@ int main (int argc, char** argv, char** envp){
         parse_command (commandline, &cmd);
 
         switch (get_cmd_code (cmd.name)){
-            case EMPTY_CMD:
-                break;
+	case EMPTY_CMD:
+	    break;
 
-            case CD_CMD:
-                change_directory (cmd.argv[1], loglevel);
-                break;
+	case CD_CMD:
+	    change_directory (cmd.argv[1], loglevel);
+	    break;
 
-            case HELP_CMD:
-                print_help(allowedList);
-                break;
+	case HELP_CMD:
+	    print_help(allowedList);
+	    break;
 
-            case ENV_CMD:
-                print_env (cmd.argv[1]);
-                break;
+	case ENV_CMD:
+	    print_env (cmd.argv[1]);
+	    break;
 
-            case EXIT_CMD:
-                closelog();
-                return 0;
+	case EXIT_CMD:
+	    closelog();
+	    return 0;
 
-            case OTHER_CMD:
-                pid = fork();
-                if (pid == 0){
-                    if (!check_validity (&cmd, allowedList)){
-                        execvp (cmd.name, cmd.argv);
-                        fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                        if (loglevel >= 2)
-                            syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
-                    }else
-                        fprintf (stdout, "Not allowed! \n");
+	case OTHER_CMD:
+	    pid = fork();
+	    if (pid == 0){
+		if (!check_validity (&cmd, allowedList)){
+		    execvp (cmd.name, cmd.argv);
+		    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+		    if (loglevel >= 2)
+			syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
+		}else
+		    fprintf (stdout, "Not allowed! \n");
 
-                    kill(getpid(), SIGTERM);
-                    break;
-                }else if (pid < 0){
-                    fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
-                }else {
-                    wait (0);
-                }
-                break;
+		kill(getpid(), SIGTERM);
+		break;
+	    }else if (pid < 0){
+		fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
+	    }else {
+		wait (0);
+	    }
+	    break;
         }
     }
 
