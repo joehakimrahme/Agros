@@ -34,7 +34,7 @@ ifdef SYSCONFDIR
 endif
 
 main.o: agros.o include/agros.h
-ifdef SYSCONFDIR
+ifdef SYSCONF
 	$(CC) $(CFLAGS) -c -I include/ `pkg-config --cflags glib-2.0` -DCONFIG_FILE=$(SYSCONF) src/main.c
 else
 	$(CC) $(CFLAGS) -c -I include/ `pkg-config --cflags glib-2.0` src/main.c
