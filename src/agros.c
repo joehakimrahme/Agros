@@ -32,6 +32,7 @@
 
 #ifndef CONFIG_FILE
 #define CONFIG_FILE "agros.conf"
+#define GROUP1 "General"
 #endif
 
 /*
@@ -232,10 +233,15 @@ void print_allowed (char** allowed){
     }
 }
 
-void parse_config (char** allowedList, int* allowed_nbr, char* welcomeMessage, int* loglevel){
-    GKeyFile* gkf;
+void parse_config (char*** allowedList, int* allowed_nbr, char** welcomeMessage, int* loglevel){
+    /*
+     * EFFECTS: parses CONFIG_FILE.
+     * MODIFIES: allowedList, allowed_nbr, welcomeMessage, loglevel
+     */
 
-    /* Gets the data from CONFIG_FILE */
+    GKeyFile* gkf;
+    gsize     gallowed_nbr;
+
     gkf = g_key_file_new();
 
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
@@ -244,19 +250,29 @@ void parse_config (char** allowedList, int* allowed_nbr, char* welcomeMessage, i
 	exit (EXIT_FAILURE);
     }
 
-    loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
-    allowedList = g_key_file_get_string_list (gkf, "General", "allowed", &allowed_nbr, NULL);
-    welcomeMessage = g_key_file_get_string (gkf, "General", "welcome", NULL);
-
-    /*
-     * That's my disgusting way of saying: "Let's keep logging aside for the moment,
-     * I need to deliver v0.1"
-     *
+    /* Note: whether the undetected keys in agros.conf should go into stderr or syslog is
+     *  a matter of debate. Given that there is no syslog right now, let's just dump things
+     *  into stderr for now and figure that out later.
      */
+    if (g_key_file_has_key (gkf, GROUP1, "loglevel", NULL)){
+	*loglevel = g_key_file_get_integer (gkf, GROUP1, "loglevel", NULL);
+    }else {
+	fprintf (stderr, "loglevel not specified in %s; setting to default 0\n",CONFIG_FILE);
+	*loglevel = 0;
+    }
 
-    loglevel = 0;
+    if (g_key_file_has_key (gkf, GROUP1, "welcome", NULL)){
+	*welcomeMessage = g_key_file_get_string (gkf, GROUP1, "welcome", NULL);
+    }else
+	fprintf(stderr, "No welcome message found in %s; setting to NULL\n", CONFIG_FILE);
 
-    /* Remember to delete the above call. Please */
-
-    g_key_file_free (gkf);
+    if (g_key_file_has_key (gkf, GROUP1, "allowed", NULL)){
+	*allowedList = g_key_file_get_string_list (gkf, GROUP1, "allowed", &gallowed_nbr, NULL);
+	*allowed_nbr = gallowed_nbr;
+    }else {
+	fprintf(stderr, "No allowed commands in agros.conf; setting to NULL\n");
+	*allowedList = NULL;
+	*allowed_nbr=0;
+    }
+     g_key_file_free (gkf);
 }
