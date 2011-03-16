@@ -1,0 +1,21 @@
+##################################
+#  AGROS - The New Limited Shell #
+##################################
+
+Contact: joe.hakim.rahme@gmail.com
+https://github.com/rahmu/Agros
+
+
+=== agros-0.2.0 15/02/2011 ===
+    * Added welcome message (thanks ehd)
+    * Added SYSCONFDIR and TARGETDIR on Makefile
+
+
+=== agros-0.1.0 17/02/2011 ===
+    * Initial version
+    * Built-in functions:
+        - cd
+        - ?
+        - env
+        - exit
+    * Using execvp() for process execution

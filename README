@@ -19,20 +19,15 @@
     This is why AGROS is rightfully named AGROS Got Rid Of the Snake. I'm pretty
     proud of that name :)
 
-    The idea is to define in a conf file what commands the user can or cannot
-    execute. It's a restrictive shell used for security puproses.
+    The way it works is that the administrator defines a certain list of commands the user
+    can execute. It's a restrictive shell used for security puproses.
 
 
-Version 0.1:
-############
 
-    * Release Date: 17/02/2011
-    * Built-in functions:
-        - cd
-        - ?
-        - env
-        - exit
-    * Using execvp() for process execution
+Latest Release:
+###############
+    * Release Name: agros-0.2.0
+    * Release Date: 15/03/2011
 
 
 Dependencies:
@@ -48,21 +43,28 @@ Dependencies:
 Installation:
 #############
 
-    Simply run make.
+    You can compile the program by running "make". If the dependencies are present,
+    it will create a binary executable named "agros" that can be directly runnable.
 
-    So far there are no dependencies to the shell, but I'm planning on adding libglib-2.0.0
-    as a first dependency to parse config files, and GNU Readline for better interactive
-    prompt. (Although first attempts at adding GNU Readlien weren't the most successful).
+    If make is called without any arguments, then agros will look for a file called
+    "agros.conf" in the current directory.
 
-    Once compiled, you can launch the shell with ./agros.
+    You can give two command line arguments to make:
+
+    - SYSCONFDIR:   Determines the directory where "agros.conf" is located. make will also
+                    copy automatically the conf file to SYSCONFDIR
+
+    - TARGETDIR:    Determines the directory where the executable will be moved.
 
 
 Configuration:
 ##############
 
-    So far there is only one variable to define in the configuration agros.conf.
-    Set the "allowed" array to a list of allowed commands in the shell. Separator should be ";"
-    and make sure to leave no spaces between different items.
+    There are two variables defined in the agros.conf file.
+
+    - allowed: Gives a list of the allowed commands separated by a semi-colon ";"
+    - welcome: Displays a welcome message
+
 
 Contact
 #######
