@@ -78,4 +78,4 @@ int     get_cmd_code        (char* cmd_name);
 int     check_validity      (command_t* cmd, char** allowed);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
-void    parse_config        (char*** allowedList, int* allowed_nbr, char** welcomeMessage, int* loglevel);
+void    parse_config        (char*** allowed_list, int* allowed_nbr, char** welcome_message, int* loglevel);

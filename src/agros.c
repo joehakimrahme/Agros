@@ -32,8 +32,8 @@
 
 #ifndef CONFIG_FILE
 #define CONFIG_FILE "agros.conf"
-#define GROUP1 "General"
 #endif
+#define GROUP1 "General"
 
 /*
  * A global array holding the associations between each built-in command
@@ -182,7 +182,7 @@ int get_cmd_code (char* cmd_name){
 
 /*
  * This function checks for the validity of user input.
- * allowedList is an array of strings, the only commands
+ * allowed_list is an array of strings, the only commands
  * allowed to use.
  *
  */
@@ -233,15 +233,14 @@ void print_allowed (char** allowed){
     }
 }
 
-void parse_config (char*** allowedList, int* allowed_nbr, char** welcomeMessage, int* loglevel){
-    /*
-     * EFFECTS: parses CONFIG_FILE.
-     * MODIFIES: allowedList, allowed_nbr, welcomeMessage, loglevel
-     */
+/*
+ * EFFECTS: parses CONFIG_FILE.
+ * MODIFIES: allowed_list, allowed_nbr, welcome_message, loglevel
+ */
 
+void parse_config (char*** allowed_list, int* allowed_nbr, char** welcome_message, int* loglevel){
     GKeyFile* gkf;
     gsize     gallowed_nbr;
-
     gkf = g_key_file_new();
 
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
@@ -262,17 +261,18 @@ void parse_config (char*** allowedList, int* allowed_nbr, char** welcomeMessage,
     }
 
     if (g_key_file_has_key (gkf, GROUP1, "welcome", NULL)){
-	*welcomeMessage = g_key_file_get_string (gkf, GROUP1, "welcome", NULL);
+	*welcome_message = g_key_file_get_string (gkf, GROUP1, "welcome", NULL);
     }else
 	fprintf(stderr, "No welcome message found in %s; setting to NULL\n", CONFIG_FILE);
 
     if (g_key_file_has_key (gkf, GROUP1, "allowed", NULL)){
-	*allowedList = g_key_file_get_string_list (gkf, GROUP1, "allowed", &gallowed_nbr, NULL);
+	*allowed_list = g_key_file_get_string_list (gkf, GROUP1, "allowed", &gallowed_nbr, NULL);
 	*allowed_nbr = gallowed_nbr;
     }else {
-	fprintf(stderr, "No allowed commands in agros.conf; setting to NULL\n");
-	*allowedList = NULL;
+	fprintf (stderr, "No allowed commands in agros.conf; setting to NULL\n");
+	*allowed_list = NULL;
 	*allowed_nbr=0;
     }
+
      g_key_file_free (gkf);
 }

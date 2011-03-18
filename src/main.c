@@ -35,12 +35,12 @@ int main (int argc, char** argv, char** envp){
     char commandline[MAX_LINE_LEN];
 
     /* Configuration file parameters */
-    char** allowedList;
+    char** allowed_list;
     int allowed_nbr;
-    char* welcomeMessage;
+    char* welcome_message;
     int loglevel;
     
-    parse_config(&allowedList, &allowed_nbr, &welcomeMessage, &loglevel);
+    parse_config(&allowed_list, &allowed_nbr, &welcome_message, &loglevel);
 
     /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
        Log file manipulations such as compressions, purging or backup are left for the user
@@ -55,8 +55,8 @@ int main (int argc, char** argv, char** envp){
      *   - or a system command, in which case the program forks and executes it with execvp()
      */
 
-    if (welcomeMessage!=NULL) {
-        fprintf (stdout, "\n%s\n\n", welcomeMessage);
+    if (welcome_message!=NULL) {
+        fprintf (stdout, "\n%s\n\n", welcome_message);
     }
 
     while (1){
@@ -73,7 +73,7 @@ int main (int argc, char** argv, char** envp){
    	    break;
 
    	case HELP_CMD:
-   	    print_help(allowedList);
+   	    print_help(allowed_list);
    	    break;
 
    	case ENV_CMD:
@@ -87,7 +87,7 @@ int main (int argc, char** argv, char** envp){
    	case OTHER_CMD:
    	    pid = fork();
    	    if (pid == 0){
-   		if (!check_validity (&cmd, allowedList)){
+   		if (!check_validity (&cmd, allowed_list)){
    		    execvp (cmd.name, cmd.argv);
    		    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
    		    if (loglevel >= 2)
