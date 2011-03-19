@@ -35,12 +35,12 @@ int main (int argc, char** argv, char** envp){
     char commandline[MAX_LINE_LEN];
 
     /* Configuration file parameters */
-    char** allowedList;
+    char** allowed_list;
     int allowed_nbr;
-    char* welcomeMessage;
+    char* welcome_message;
     int loglevel;
     
-    parse_config(&allowedList, &allowed_nbr, &welcomeMessage, &loglevel);
+    parse_config(&allowed_list, &allowed_nbr, &welcome_message, &loglevel);
 
     /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
        Log file manipulations such as compressions, purging or backup are left for the user
@@ -52,11 +52,11 @@ int main (int argc, char** argv, char** envp){
      *   - print prompt
      *   - read input and parse it
      *   - either a built-in command ("cd", "?" or "exit)
-     *   - or a system command, in which 	case the program forks and executes it with execvp()
+     *   - or a system command, in which case the program forks and executes it with execvp()
      */
 
-    if (welcomeMessage!=NULL) {
-        fprintf (stdout, "\n%s\n\n", welcomeMessage);
+    if (welcome_message!=NULL) {
+        fprintf (stdout, "\n%s\n\n", welcome_message);
     }
 
     while (1){
@@ -65,43 +65,44 @@ int main (int argc, char** argv, char** envp){
         parse_command (commandline, &cmd);
 
         switch (get_cmd_code (cmd.name)){
-		    case EMPTY_CMD:
-   	        break;
+            case EMPTY_CMD:
+   	            break;
 
-		    case CD_CMD:
-   	        change_directory (cmd.argv[1], loglevel);
-   	        break;
+            case CD_CMD:
+   	            change_directory (cmd.argv[1], loglevel);
+   	            break;
 
-   		    case HELP_CMD:
-   	        print_help(allowedList);
-   	        break;
+            case HELP_CMD:
+   	            print_help(allowed_list);
+   	            break;
 
-   		    case ENV_CMD:
-   	        print_env (cmd.argv[1]);
-   	        break;
+            case ENV_CMD:
+   	            print_env (cmd.argv[1]);
+   	            break;
 
-   		    case EXIT_CMD:
-   	        closelog();
-   	        return 0;
+            case EXIT_CMD:
+   	            closelog();
+   	            return 0;
 
-   		    case OTHER_CMD:
-   	        pid = fork();
-   	        if (pid == 0){
-   		        if (!check_validity (&cmd, allowedList)){
-   		            execvp (cmd.name, cmd.argv);
-   		            fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-   		            if (loglevel >= 2)
-   		            	syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
-   		        }else
-   		            fprintf (stdout, "Not allowed! \n");
+            case OTHER_CMD:
+   	            pid = fork();
+   	            if (pid == 0){
+   	        	if (!check_validity (&cmd, allowed_list)){
+   	        	    execvp (cmd.name, cmd.argv);
+   	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+   	        	    if (loglevel >= 2)
+   	        		syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
+   	        	}else
+   	        	    fprintf (stdout, "Not allowed! \n");
 
-   		        kill(getpid(), SIGTERM);
-   		        break;
-   	        }else if (pid < 0){
-   		        fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
-   	        }else 
-   		        wait (0);
-   	        break;
+   	        	kill(getpid(), SIGTERM);
+   	        	break;
+   	            }else if (pid < 0){
+   	        	fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
+   	            }else {
+   	        	wait (0);
+   	            }
+   	            break;
         }
     }
 
