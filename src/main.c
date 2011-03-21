@@ -76,7 +76,6 @@ int main (int argc, char** argv, char** envp){
    	            break;
 
             case EXIT_CMD:
-   	            closelog();
    	            return 0;
 
             case OTHER_CMD:
@@ -85,7 +84,6 @@ int main (int argc, char** argv, char** envp){
    	        	if (!check_validity (&cmd, allowed_list)){
    	        	    execvp (cmd.name, cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-   	        	    if (loglevel >= 2)
    	        	}else
    	        	    fprintf (stdout, "Not allowed! \n");
 
