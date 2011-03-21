@@ -32,7 +32,6 @@
 #ifndef CONFIG_FILE
 #define CONFIG_FILE "agros.conf"
 #endif
-#define GROUP1 "General"
 
 /*
  * A global array holding the associations between each built-in command
@@ -247,16 +246,16 @@ void parse_config (char*** allowed_list, int* allowed_nbr, char** welcome_messag
     }
 
     /* If the file exists and is loaded, we proceed to parsing it */
-    if (g_key_file_has_key (gkf, GROUP1, "loglevel", NULL))
-	    *loglevel = g_key_file_get_integer (gkf, GROUP1, "loglevel", NULL);
+    if (g_key_file_has_key (gkf, "General", "loglevel", NULL))
+	    *loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
     else
 	    *loglevel = 0;
 
-    if (g_key_file_has_key (gkf, GROUP1, "welcome", NULL))
-	    *welcome_message = g_key_file_get_string (gkf, GROUP1, "welcome", NULL);
+    if (g_key_file_has_key (gkf, "General", "welcome", NULL))
+	    *welcome_message = g_key_file_get_string (gkf, "General", "welcome", NULL);
 
-    if (g_key_file_has_key (gkf, GROUP1, "allowed", NULL)){
-	    *allowed_list = g_key_file_get_string_list (gkf, GROUP1, "allowed", &gallowed_nbr, NULL);
+    if (g_key_file_has_key (gkf, "General", "allowed", NULL)){
+	    *allowed_list = g_key_file_get_string_list (gkf, "General", "allowed", &gallowed_nbr, NULL);
 	    *allowed_nbr = gallowed_nbr;
     }else {
 	    *allowed_list = NULL;
