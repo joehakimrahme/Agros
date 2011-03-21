@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <syslog.h>
 #include <assert.h>
 #include <glib.h>
 #include "agros.h"
@@ -76,9 +75,9 @@ void parse_command (char *cmdline, command_t *cmd){
     if (word == NULL) { word = ""; } // Fixes blank line bug
 
     while (word) {
-	cmd->argv[count] = word;
-	word = strtok (NULL, WHITESPACE);
-	count++;
+        cmd->argv[count] = word;
+        word = strtok (NULL, WHITESPACE);
+        count++;
     }
     cmd->argv[count] = NULL;
 
@@ -94,15 +93,17 @@ void parse_command (char *cmdline, command_t *cmd){
 
 int read_input (char* string, int num){
     char* CRPosition = NULL;
+
     if (fgets (string, num, stdin)){
-	CRPosition = strchr (string, '\n');
-	if (CRPosition){
-	    *CRPosition = '\0';
-	}
-	return 1;
-    }else {
-	return 0;
-    }
+	    CRPosition = strchr (string, '\n');
+
+	    if (CRPosition)
+	        *CRPosition = '\0';
+
+	    return 1;
+
+    }else
+	    return 0;
 }
 
 
@@ -155,13 +156,11 @@ void change_directory (char* path, int loglevel){
     }
 
     if (chdir (path) == 0){
-	getcwd (path, MAX_LINE_LEN);
-	setenv ("PWD", path, 1);
-    }else{
-	fprintf (stderr, "%s: Could not change to such directory\n", path);
-	if (loglevel >= 2)
-	    syslog (LOG_USER, "#LGLVL2# <%s> Could not change to directory: %s. \n", getenv("USER"), path);
-    }
+	    getcwd (path, MAX_LINE_LEN);
+	    setenv ("PWD", path, 1);
+    } else
+	    fprintf (stderr, "%s: Could not change to such directory\n", path);
+
 }
 
 /*
@@ -173,9 +172,8 @@ void change_directory (char* path, int loglevel){
 int get_cmd_code (char* cmd_name){
     int i = 0;
     for (i=0; i<100; i++){
-	if (!strcmp (my_commands[i].command_name, cmd_name)){
-	    return my_commands[i].command_code;
-	}
+	    if (!strcmp (my_commands[i].command_name, cmd_name))
+	        return my_commands[i].command_code;
     }
     return OTHER_CMD;
 }
@@ -192,9 +190,9 @@ int check_validity (command_t* cmd, char** allowed){
     int i = 0;
 
     while (allowed[i]){
-	if (!strcmp (allowed[i], cmd->name))
-	    valid = 0;
-	i++;
+	    if (!strcmp (allowed[i], cmd->name))
+	        valid = 0;
+	    i++;
     }
     return valid;
 }
@@ -209,14 +207,14 @@ void print_env (char* env_variable){
     char** var = NULL;
 
     if (env_variable != NULL){
-	env_value = getenv(env_variable);
-	if (env_value)
-	    fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
-	else
-	    fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
+	    env_value = getenv(env_variable);
+	    if (env_value)
+	        fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
+	    else
+	        fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
     }else {
-	for (var = environ; *var != NULL; ++var)
-	    fprintf (stdout, "%s\n", *var);
+	    for (var = environ; *var != NULL; ++var)
+	        fprintf (stdout, "%s\n", *var);
     }
 }
 
@@ -228,8 +226,8 @@ void print_env (char* env_variable){
 void print_allowed (char** allowed){
     int i=0;
     while (allowed[i]){
-	fprintf (stdout, " * %s\n", allowed[i]);
-	i++;
+	    fprintf (stdout, " * %s\n", allowed[i]);
+	    i++;
     }
 }
 
@@ -244,34 +242,25 @@ void parse_config (char*** allowed_list, int* allowed_nbr, char** welcome_messag
     gkf = g_key_file_new();
 
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-	fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-	/* syslog (LOG_USER, "<%s> Could not read config file. \n", getenv("USER")); */
-	exit (EXIT_FAILURE);
+	    fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
+	    exit (EXIT_FAILURE);
     }
 
-    /* Note: whether the undetected keys in agros.conf should go into stderr or syslog is
-     *  a matter of debate. Given that there is no syslog right now, let's just dump things
-     *  into stderr for now and figure that out later.
-     */
-    if (g_key_file_has_key (gkf, GROUP1, "loglevel", NULL)){
-	*loglevel = g_key_file_get_integer (gkf, GROUP1, "loglevel", NULL);
-    }else {
-	fprintf (stderr, "loglevel not specified in %s; setting to default 0\n",CONFIG_FILE);
-	*loglevel = 0;
-    }
+    /* If the file exists and is loaded, we proceed to parsing it */
+    if (g_key_file_has_key (gkf, GROUP1, "loglevel", NULL))
+	    *loglevel = g_key_file_get_integer (gkf, GROUP1, "loglevel", NULL);
+    else
+	    *loglevel = 0;
 
-    if (g_key_file_has_key (gkf, GROUP1, "welcome", NULL)){
-	*welcome_message = g_key_file_get_string (gkf, GROUP1, "welcome", NULL);
-    }else
-	fprintf(stderr, "No welcome message found in %s; setting to NULL\n", CONFIG_FILE);
+    if (g_key_file_has_key (gkf, GROUP1, "welcome", NULL))
+	    *welcome_message = g_key_file_get_string (gkf, GROUP1, "welcome", NULL);
 
     if (g_key_file_has_key (gkf, GROUP1, "allowed", NULL)){
-	*allowed_list = g_key_file_get_string_list (gkf, GROUP1, "allowed", &gallowed_nbr, NULL);
-	*allowed_nbr = gallowed_nbr;
+	    *allowed_list = g_key_file_get_string_list (gkf, GROUP1, "allowed", &gallowed_nbr, NULL);
+	    *allowed_nbr = gallowed_nbr;
     }else {
-	fprintf (stderr, "No allowed commands in agros.conf; setting to NULL\n");
-	*allowed_list = NULL;
-	*allowed_nbr=0;
+	    *allowed_list = NULL;
+	    *allowed_nbr=0;
     }
 
      g_key_file_free (gkf);

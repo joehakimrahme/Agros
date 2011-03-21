@@ -26,7 +26,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <syslog.h>
 #include "agros.h"
 
 int main (int argc, char** argv, char** envp){
@@ -42,10 +41,6 @@ int main (int argc, char** argv, char** envp){
     
     parse_config(&allowed_list, &allowed_nbr, &welcome_message, &loglevel);
 
-    /* Opens a log connection. AGROS relies on underlying Syslog to deal with logging issues.
-       Log file manipulations such as compressions, purging or backup are left for the user
-       to deal with. Until I find a better way to do it, that is :-) */
-    openlog ("[AGROS]", LOG_CONS, LOG_USER);
 
     /*
      *   Main loop:
@@ -91,23 +86,19 @@ int main (int argc, char** argv, char** envp){
    	        	    execvp (cmd.name, cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
    	        	    if (loglevel >= 2)
-   	        		syslog (LOG_USER, "#LGLVL2# <%s> %s: Could not execute command. \n", getenv("USER"), cmd.name);
    	        	}else
    	        	    fprintf (stdout, "Not allowed! \n");
 
    	        	kill(getpid(), SIGTERM);
    	        	break;
    	            }else if (pid < 0){
-   	        	fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
+                    fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
    	            }else {
-   	        	wait (0);
+                    wait (0);
    	            }
    	            break;
         }
     }
-
-    /* Close your log when you're done. Always. */
-    closelog();
 
     return 0;
 }
