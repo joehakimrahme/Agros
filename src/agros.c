@@ -208,7 +208,7 @@ int check_validity (command_t* cmd, char** allowed){
     int i = 0;
 
     while (allowed[i]){
-	    if (!strcmp (allowed[i], cmd->name))
+	    if (!strcmp (allowed[i], cmd->name) || !strcmp (allowed[i], "*"))
 	        valid = 0;
 	    i++;
     }
