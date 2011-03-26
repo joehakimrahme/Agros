@@ -133,32 +133,51 @@ void print_prompt (void){
  */
 
 void print_help(char** allowed){
-    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\nNote: At any time, you can type 'exit' to close the shell.\nList of allowed actions:\n");
+    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
+    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\nList of allowed actions:\n");
     print_allowed(allowed);
 }
 
 /*
- * This command changes the current working directory used in the computation
- * of relative paths. using the chdir() function.
- * It then updates the $PWD environment variable with the new value of the current
- * directory
+ * Uses chdir() to change current working directory. Then updates the environement,
+ * with the new value of PWD.
+ *
+ * If path is NULL, the function sends the user to his home directory. It builds the path
+ * in the temp string "home" then copies it into "path" before freeing "home".
+ *
  */
 
 void change_directory (char* path, int loglevel){
 
-    /* Another abitrary size for arrays. I should really look into some hardcore malloc() */
-    char home[100] = "/home/";
+    char* home;
 
     if (path == NULL){
-	strcat (home, getenv("USERNAME"));
-	path = home;
+
+        /* Creates the "home" variable containing path to home directory */
+        if ((home = malloc (strlen ("/home/") + strlen (getenv ("USERNAME")) + 1)) == NULL){
+            fprintf (stderr, "Memory allocation error!");
+            exit(EXIT_FAILURE);
+        }
+
+        strcpy (home, "");
+        strcat (home, "/home/");
+        strcat (home, getenv ("USERNAME"));
+
+        /* Copies the "home" temp variable into "path" in order to allow a free() */
+        if ((path = malloc (strlen(home))) == NULL){
+            fprintf (stderr, "Memory allocation error!");
+            exit(EXIT_FAILURE);
+        }
+
+        strcpy (path, home);
+        free (home);
     }
 
     if (chdir (path) == 0){
-	    getcwd (path, MAX_LINE_LEN);
-	    setenv ("PWD", path, 1);
+        getcwd (path, MAX_LINE_LEN);
+        setenv ("PWD", path, 1);
     } else
-	    fprintf (stderr, "%s: Could not change to such directory\n", path);
+        fprintf (stderr, "%s: Could not change to such directory\n", path);
 
 }
 
