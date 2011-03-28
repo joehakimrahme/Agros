@@ -6,6 +6,11 @@ Contact: joe.hakim.rahme@gmail.com
 https://github.com/rahmu/Agros
 
 
+=== agros-0.2.1 28/02/2011 ===
+    * Allows the use of "*" in allowed commands.
+    * Fixes bugs and code refactoring.
+
+
 === agros-0.2.0 15/02/2011 ===
     * Added welcome message (thanks ehd)
     * Added SYSCONFDIR and TARGETDIR on Makefile
