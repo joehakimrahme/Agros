@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <syslog.h>
 #include <sys/wait.h>
 #include "agros.h"
 
@@ -39,7 +40,11 @@ int main (int argc, char** argv, char** envp){
     char* welcome_message;
     int loglevel;
     
-    parse_config(&allowed_list, &allowed_nbr, &welcome_message, &loglevel);
+    /* Opens the syslog file */
+    openlog ("[AGROS]", LOG_PID, LOG_USER);
+
+    /* Parses the config files for data */
+    parse_config (&allowed_list, &allowed_nbr, &welcome_message, &loglevel);
 
 
     /*
@@ -76,21 +81,27 @@ int main (int argc, char** argv, char** envp){
    	            break;
 
             case EXIT_CMD:
+                closelog ();
    	            return 0;
 
             case OTHER_CMD:
    	            pid = fork();
    	            if (pid == 0){
    	        	if (!check_validity (&cmd, allowed_list)){
+                    if (loglevel == 3)  syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
    	        	    execvp (cmd.name, cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-   	        	}else
+                    if (loglevel >= 2)  syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
+                }else {
    	        	    fprintf (stdout, "Not allowed! \n");
+                    if (loglevel >= 1)  syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
+                }
 
    	        	kill(getpid(), SIGTERM);
    	        	break;
    	            }else if (pid < 0){
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
+                    if (loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
    	            }else {
                     wait (0);
    	            }
@@ -98,5 +109,6 @@ int main (int argc, char** argv, char** envp){
         }
     }
 
+    closelog();
     return 0;
 }

@@ -26,6 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <syslog.h>
 #include <glib.h>
 #include "agros.h"
 
@@ -174,10 +175,13 @@ void change_directory (char* path, int loglevel){
     }
 
     if (chdir (path) == 0){
+        if (loglevel >= 3) syslog (LOG_NOTICE, "Changing to directory: %s.", path);
         getcwd (path, MAX_LINE_LEN);
         setenv ("PWD", path, 1);
-    } else
+    } else {
         fprintf (stderr, "%s: Could not change to such directory\n", path);
+        if (loglevel >= 2) syslog (LOG_NOTICE, "Could not change to directory: %s.", path);
+    }
 
 }
 
@@ -257,26 +261,33 @@ void print_allowed (char** allowed){
 void parse_config (char*** allowed_list, int* allowed_nbr, char** welcome_message, int* loglevel){
     GKeyFile* gkf;
     gsize     gallowed_nbr;
-    gkf = g_key_file_new();
+    gkf = g_key_file_new ();
 
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
 	    fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
+        syslog (LOG_ERR, "Could not read config file: %s.", CONFIG_FILE);
+        closelog ();
 	    exit (EXIT_FAILURE);
     }
 
     /* If the file exists and is loaded, we proceed to parsing it */
-    if (g_key_file_has_key (gkf, "General", "loglevel", NULL))
+    if (g_key_file_has_key (gkf, "General", "loglevel", NULL)){
 	    *loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
+        syslog (LOG_NOTICE, "Setting log level to: %d.", *loglevel);
+    }
     else
 	    *loglevel = 0;
 
-    if (g_key_file_has_key (gkf, "General", "welcome", NULL))
+    if (g_key_file_has_key (gkf, "General", "welcome", NULL)){
 	    *welcome_message = g_key_file_get_string (gkf, "General", "welcome", NULL);
+        if (*loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", *welcome_message);
+    }
 
     if (g_key_file_has_key (gkf, "General", "allowed", NULL)){
 	    *allowed_list = g_key_file_get_string_list (gkf, "General", "allowed", &gallowed_nbr, NULL);
 	    *allowed_nbr = gallowed_nbr;
     }else {
+        if (*loglevel >=1) syslog (LOG_NOTICE, "No allowed list. Setting allowed to NULL");
 	    *allowed_list = NULL;
 	    *allowed_nbr=0;
     }
