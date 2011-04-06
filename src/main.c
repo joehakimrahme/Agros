@@ -33,18 +33,14 @@ int main (int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd = {NULL, 0, {NULL}};
     char commandline[MAX_LINE_LEN];
+    char* username = "rahmu";
+    config_t ag_config;
 
-    /* Configuration file parameters */
-    char** allowed_list;
-    int allowed_nbr;
-    char* welcome_message;
-    int loglevel;
-    
     /* Opens the syslog file */
     openlog ("[AGROS]", LOG_PID, LOG_USER);
 
     /* Parses the config files for data */
-    parse_config (&allowed_list, &allowed_nbr, &welcome_message, &loglevel);
+    parse_config (&ag_config, username);
 
 
     /*
@@ -55,8 +51,8 @@ int main (int argc, char** argv, char** envp){
      *   - or a system command, in which case the program forks and executes it with execvp()
      */
 
-    if (welcome_message!=NULL) {
-        fprintf (stdout, "\n%s\n\n", welcome_message);
+    if (ag_config.welcome_message!=NULL) {
+        fprintf (stdout, "\n%s\n\n", ag_config.welcome_message);
     }
 
     while (1){
@@ -69,11 +65,11 @@ int main (int argc, char** argv, char** envp){
    	            break;
 
             case CD_CMD:
-   	            change_directory (cmd.argv[1], loglevel);
+                change_directory (cmd.argv[1], ag_config.loglevel);
    	            break;
 
             case HELP_CMD:
-   	            print_help(allowed_list);
+                print_help(ag_config.allowed_list);
    	            break;
 
             case ENV_CMD:
@@ -87,21 +83,21 @@ int main (int argc, char** argv, char** envp){
             case OTHER_CMD:
    	            pid = fork();
    	            if (pid == 0){
-   	        	if (!check_validity (&cmd, allowed_list)){
-                    if (loglevel == 3)  syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
+                if (!check_validity (&cmd, ag_config.allowed_list)){
+                    if (ag_config.loglevel == 3)  syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
    	        	    execvp (cmd.name, cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                    if (loglevel >= 2)  syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
+                    if (ag_config.loglevel >= 2)  syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
                 }else {
    	        	    fprintf (stdout, "Not allowed! \n");
-                    if (loglevel >= 1)  syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
+                    if (ag_config.loglevel >= 1)  syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
                 }
 
    	        	kill(getpid(), SIGTERM);
    	        	break;
    	            }else if (pid < 0){
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
-                    if (loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
+                    if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
    	            }else {
                     wait (0);
    	            }

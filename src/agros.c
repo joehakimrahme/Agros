@@ -258,9 +258,10 @@ void print_allowed (char** allowed){
  * MODIFIES: allowed_list, allowed_nbr, welcome_message, loglevel
  */
 
-void parse_config (char*** allowed_list, int* allowed_nbr, char** welcome_message, int* loglevel){
+void parse_config (config_t* config, char* username){
     GKeyFile* gkf;
     gsize     gallowed_nbr;
+
     gkf = g_key_file_new ();
 
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
@@ -272,24 +273,24 @@ void parse_config (char*** allowed_list, int* allowed_nbr, char** welcome_messag
 
     /* If the file exists and is loaded, we proceed to parsing it */
     if (g_key_file_has_key (gkf, "General", "loglevel", NULL)){
-	    *loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
-        syslog (LOG_NOTICE, "Setting log level to: %d.", *loglevel);
+	    config->loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
+        syslog (LOG_NOTICE, "Setting log level to: %d.", config->loglevel);
     }
     else
-	    *loglevel = 0;
+	    config->loglevel = 0;
 
     if (g_key_file_has_key (gkf, "General", "welcome", NULL)){
-	    *welcome_message = g_key_file_get_string (gkf, "General", "welcome", NULL);
-        if (*loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", *welcome_message);
+	    config->welcome_message = g_key_file_get_string (gkf, "General", "welcome", NULL);
+        if (config->loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", config->welcome_message);
     }
 
     if (g_key_file_has_key (gkf, "General", "allowed", NULL)){
-	    *allowed_list = g_key_file_get_string_list (gkf, "General", "allowed", &gallowed_nbr, NULL);
-	    *allowed_nbr = gallowed_nbr;
+	    config->allowed_list = g_key_file_get_string_list (gkf, "General", "allowed", &gallowed_nbr, NULL);
+	    config->allowed_nbr = gallowed_nbr;
     }else {
-        if (*loglevel >=1) syslog (LOG_NOTICE, "No allowed list. Setting allowed to NULL");
-	    *allowed_list = NULL;
-	    *allowed_nbr=0;
+        if (config->loglevel >=1) syslog (LOG_NOTICE, "No allowed list. Setting allowed to NULL");
+	    config->allowed_list = NULL;
+	    config->allowed_nbr = 0;
     }
 
      g_key_file_free (gkf);

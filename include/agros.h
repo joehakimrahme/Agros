@@ -46,7 +46,8 @@ struct built_in_commands{
     int command_code;
 };
 
-/* This structure holds user input. 3 fields:
+/*
+ * This structure holds user input. 3 fields:
  *   - argv: an array of strings. Each word of the input is a case of the array.
  *   - name: the name of the executable called. By default it's argv[0]
  *   - argc: the number of words given in input. It's equivalent to the length of argv.
@@ -64,6 +65,18 @@ struct command_t{
 
 
 /*
+ * A structure that holds the AGROS conf.
+ */
+
+typedef struct config_t config_t;
+struct config_t{
+    char** allowed_list;
+    int allowed_nbr;
+    char* welcome_message;
+    int loglevel;
+};
+
+/*
  * These are the functions called by AGROS. These declarations are pretty explicit.
  * More detailed comments can be found in source files.
  *
@@ -78,4 +91,4 @@ int     get_cmd_code        (char* cmd_name);
 int     check_validity      (command_t* cmd, char** allowed);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
-void    parse_config        (char*** allowed_list, int* allowed_nbr, char** welcome_message, int* loglevel);
+void    parse_config        (config_t* config, char* username);
