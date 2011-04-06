@@ -84,7 +84,7 @@ struct config_t{
 
 void    parse_command       (char *cmdline, command_t *cmd);
 int     read_input          (char* string, int num);
-void    print_prompt        (void);
+void    print_prompt        (char* username);
 void    print_help          (char** allowed);
 void    change_directory    (char* path, int loglevel);
 int     get_cmd_code        (char* cmd_name);
@@ -92,3 +92,4 @@ int     check_validity      (command_t* cmd, char** allowed);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
 void    parse_config        (config_t* config, char* username);
+void    set_username        (char** username);

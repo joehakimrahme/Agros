@@ -28,6 +28,8 @@
 #include <assert.h>
 #include <syslog.h>
 #include <glib.h>
+#include <pwd.h>
+#include <sys/types.h>
 #include "agros.h"
 
 #ifndef CONFIG_FILE
@@ -115,16 +117,7 @@ int read_input (char* string, int num){
  *
  */
 
-void print_prompt (void){
-    char* username = NULL;
-
-    if (getenv ("USERNAME"))
-	username = getenv ("USERNAME");
-    else
-	username = getenv ("USER");
-
-    assert (username != NULL);
-
+void print_prompt (char* username){
     fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
 }
 
@@ -294,4 +287,15 @@ void parse_config (config_t* config, char* username){
     }
 
      g_key_file_free (gkf);
+}
+
+/*
+ * Sets the username, using on getuid() and getpwuid()
+ * More info on these functions can easily be found in man pages.
+ *
+ */
+void set_username (char** pusername){
+    struct passwd *pwd = NULL;
+    pwd = getpwuid (getuid());
+    *pusername = pwd->pw_name;
 }

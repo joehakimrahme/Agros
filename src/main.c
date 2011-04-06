@@ -33,11 +33,14 @@ int main (int argc, char** argv, char** envp){
     int pid = 0;
     command_t cmd = {NULL, 0, {NULL}};
     char commandline[MAX_LINE_LEN];
-    char* username = "rahmu";
+    char* username = NULL;
     config_t ag_config;
 
     /* Opens the syslog file */
     openlog ("[AGROS]", LOG_PID, LOG_USER);
+
+    /* Sets the username */
+    set_username (&username);
 
     /* Parses the config files for data */
     parse_config (&ag_config, username);
@@ -56,7 +59,7 @@ int main (int argc, char** argv, char** envp){
     }
 
     while (1){
-        print_prompt();
+        print_prompt(username);
         read_input (commandline, MAX_LINE_LEN);
         parse_command (commandline, &cmd);
 
