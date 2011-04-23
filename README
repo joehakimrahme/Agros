@@ -3,7 +3,7 @@
 ##################################
 
     AGROS is my implementation in C of the Limited Shell (lshell). Lshell is a project
-    developed by ghantoos (mouzannar@gmail.com). The project consists of a UNIX shell
+    developed by ghantoos (mouzannar@gmail.com), The project consists of a UNIX shell
     coded in Python, that restricts users to a set of predefined commands. You can find
     the original project here:
 
@@ -26,8 +26,8 @@
 
 Latest Release:
 ###############
-    * Release Name: agros-0.2.1
-    * Release Date: 28/03/2011
+    * Release Name: agros-0.3.0
+    * Release Date: 23/04/2011
 
 
 Dependencies:
@@ -60,10 +60,16 @@ Installation:
 Configuration:
 ##############
 
-    There are two variables defined in the agros.conf file.
+    There are three variables defined in the agros.conf file.
 
     - allowed: Gives a list of the allowed commands separated by a semi-colon ";"
     - welcome: Displays a welcome message
+    - loglevel: Defines the level of log sent to syslog
+
+        0- No logging at all
+        1- Logging only prohibited commands
+        2- Logging commands that returned an error
+        3- Logging everything
 
 
 Contact
