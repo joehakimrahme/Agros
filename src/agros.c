@@ -268,10 +268,12 @@ void print_allowed (char** allowed){
 
 void parse_config (config_t* config, char* username){
     GKeyFile* gkf;
-    gsize     gallowed_nbr;
+    gsize gallowed_nbr;
+    char* glib_group = NULL;
 
     gkf = g_key_file_new ();
 
+    /* Loads the file into gkf */
     if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
 	    fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
         syslog (LOG_ERR, "Could not read config file: %s.", CONFIG_FILE);
@@ -280,20 +282,35 @@ void parse_config (config_t* config, char* username){
     }
 
     /* If the file exists and is loaded, we proceed to parsing it */
-    if (g_key_file_has_key (gkf, "General", "loglevel", NULL)){
-	    config->loglevel = g_key_file_get_integer (gkf, "General", "loglevel", NULL);
+
+    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "loglevel", NULL)){
+        glib_group =  username;
+    }else
+        glib_group = "General";
+    if (g_key_file_has_key (gkf, glib_group, "loglevel", NULL)){
+	    config->loglevel = g_key_file_get_integer (gkf, glib_group, "loglevel", NULL);
         syslog (LOG_NOTICE, "Setting log level to: %d.", config->loglevel);
     }
     else
 	    config->loglevel = 0;
 
-    if (g_key_file_has_key (gkf, "General", "welcome", NULL)){
-	    config->welcome_message = g_key_file_get_string (gkf, "General", "welcome", NULL);
+
+    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "welcome", NULL)){
+        glib_group =  username;
+    }else
+        glib_group = "General";
+    if (g_key_file_has_key (gkf, glib_group, "welcome", NULL)){
+	    config->welcome_message = g_key_file_get_string (gkf, glib_group, "welcome", NULL);
         if (config->loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", config->welcome_message);
     }
 
-    if (g_key_file_has_key (gkf, "General", "allowed", NULL)){
-	    config->allowed_list = g_key_file_get_string_list (gkf, "General", "allowed", &gallowed_nbr, NULL);
+
+    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "allowed", NULL)){
+        glib_group =  username;
+    }else
+        glib_group = "General";
+    if (g_key_file_has_key (gkf, glib_group, "allowed", NULL)){
+	    config->allowed_list = g_key_file_get_string_list (gkf, glib_group, "allowed", &gallowed_nbr, NULL);
 	    config->allowed_nbr = gallowed_nbr;
     }else {
         if (config->loglevel >=1) syslog (LOG_NOTICE, "No allowed list. Setting allowed to NULL");
@@ -314,3 +331,14 @@ void set_username (char** pusername){
     pwd = getpwuid (getuid());
     *pusername = pwd->pw_name;
 }
+
+/***************************************************************************************************************************
+
+void set_glib_group (char** glib_group, GKeyFile* gkf, char* username, char* key){
+    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, key, NULL)){
+        *glib_group =  username;
+    }else
+        *glib_group = "General";
+}
+
+***************************************************************************************************************************/
