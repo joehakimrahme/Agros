@@ -127,9 +127,19 @@ void print_prompt (char* username){
  */
 
 void print_help(char** allowed){
+    int i =0;
+
+    fprintf (stdout, "\n");
+    fprintf (stdout, "\n");
+    for (i=0; i<70; i++)
+        fprintf (stdout, "*");
     fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
-    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\nList of allowed actions:\n");
-    print_allowed(allowed);
+    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\nList of allowed actions:\n\n");
+    print_allowed (allowed);
+    for (i=0; i<70; i++)
+        fprintf (stdout, "*");
+    fprintf (stdout, "\n");
+    fprintf (stdout, "\n");
 }
 
 /*
@@ -240,10 +250,15 @@ void print_env (char* env_variable){
 
 void print_allowed (char** allowed){
     int i=0;
-    while (allowed[i]){
-	    fprintf (stdout, " * %s\n", allowed[i]);
-	    i++;
-    }
+
+    if (strcmp (allowed[0],"*")){
+        while (allowed[i]){
+	        fprintf (stdout, " * %s\n", allowed[i]);
+	        i++;
+        }
+        fprintf (stdout, "\n");
+    } else
+        fprintf (stdout, " * (all)\n\n");
 }
 
 /*
