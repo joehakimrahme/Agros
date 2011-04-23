@@ -71,7 +71,9 @@ struct command_t{
 typedef struct config_t config_t;
 struct config_t{
     char** allowed_list;
+    char** forbidden_list;
     int allowed_nbr;
+    int forbidden_nbr;
     char* welcome_message;
     int loglevel;
 };
@@ -85,12 +87,13 @@ struct config_t{
 void    parse_command       (char *cmdline, command_t *cmd);
 int     read_input          (char* string, int num);
 void    print_prompt        (char* username);
-void    print_help          (char** allowed);
+void    print_help          (config_t* config);
 void    change_directory    (char* path, int loglevel);
 int     get_cmd_code        (char* cmd_name);
-int     check_validity      (command_t* cmd, char** allowed);
+int     check_validity      (command_t* cmd, char** allowed, char** forbidden);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
+void    print_forbidden     (char** forbidden);
 void    parse_config        (config_t* config, char* username);
 void    set_username        (char** username);
 void    set_homedir         (char** homedir);

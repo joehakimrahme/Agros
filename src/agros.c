@@ -126,7 +126,7 @@ void print_prompt (char* username){
  * TODO: Store my string messages (help + error messages) in a separate file.
  */
 
-void print_help(char** allowed){
+void print_help(config_t* config){
     int i =0;
 
     fprintf (stdout, "\n");
@@ -134,8 +134,9 @@ void print_help(char** allowed){
     for (i=0; i<70; i++)
         fprintf (stdout, "*");
     fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
-    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\nList of allowed actions:\n\n");
-    print_allowed (allowed);
+    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\n");
+    if (config->allowed_list) print_allowed (config->allowed_list);
+    if (config->forbidden_list != NULL) print_forbidden (config->forbidden_list);
     for (i=0; i<70; i++)
         fprintf (stdout, "*");
     fprintf (stdout, "\n");
@@ -188,17 +189,33 @@ int get_cmd_code (char* cmd_name){
  * allowed_list is an array of strings, the only commands
  * allowed to use.
  *
+ * Function returns 1 if invalid, 0 if valid.
+ *
  */
 
-int check_validity (command_t* cmd, char** allowed){
+int check_validity (command_t* cmd, char** allowed, char** forbidden){
     int valid = 1;
-    int i = 0;
+    int i = 0, j = 0;
 
+    /* Checks if the command name is part of the allowed list */
     while (allowed[i]){
 	    if (!strcmp (allowed[i], cmd->name) || !strcmp (allowed[i], "*"))
 	        valid = 0;
 	    i++;
     }
+
+    /* Checks that the command line does not include any forbidden character */
+    i = 0;
+
+    while (forbidden[i]){
+        for (j=0; j<cmd->argc; j++){
+            if (strstr (cmd->argv[j], forbidden[i]) != NULL)
+                valid = 1;
+        }
+
+        i++;
+    }
+
     return valid;
 }
 
@@ -224,6 +241,24 @@ void print_env (char* env_variable){
 }
 
 /*
+ * Prints the list of forbidden commands. Used in the print_help() function
+ *
+ */
+
+void print_forbidden (char** forbidden){
+    int i=0;
+
+    fprintf (stdout, "List of forbidden characters:\n\n");
+    while (forbidden[i]){
+        fprintf (stdout, " * %s\n", forbidden[i]);
+        i++;
+    }
+
+    fprintf (stdout, "\n");
+}
+
+
+/*
  * Prints the list of allowed commands. Used in the print_help() function
  *
  */
@@ -231,6 +266,7 @@ void print_env (char* env_variable){
 void print_allowed (char** allowed){
     int i=0;
 
+    fprintf (stdout, "List of allowed actions:\n\n");
     if (strcmp (allowed[0],"*")){
         while (allowed[i]){
 	        fprintf (stdout, " * %s\n", allowed[i]);
@@ -249,6 +285,7 @@ void print_allowed (char** allowed){
 void parse_config (config_t* config, char* username){
     GKeyFile* gkf;
     gsize gallowed_nbr;
+    gsize gforbidden_nbr;
     char* glib_group = NULL;
 
     gkf = g_key_file_new ();
@@ -263,6 +300,7 @@ void parse_config (config_t* config, char* username){
 
     /* If the file exists and is loaded, we proceed to parsing it */
 
+    /* LOGLEVEL */
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "loglevel", NULL)){
         glib_group =  username;
     }else
@@ -275,6 +313,7 @@ void parse_config (config_t* config, char* username){
 	    config->loglevel = 0;
 
 
+    /* WELCOME MESSAGE */
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "welcome", NULL)){
         glib_group =  username;
     }else
@@ -286,6 +325,7 @@ void parse_config (config_t* config, char* username){
 	    config->welcome_message = NULL;
 
 
+    /* ALLOWED COMMANDS */
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "allowed", NULL)){
         glib_group =  username;
     }else
@@ -298,6 +338,22 @@ void parse_config (config_t* config, char* username){
 	    config->allowed_list = NULL;
 	    config->allowed_nbr = 0;
     }
+
+
+    /* FORBIDDEN CHARACTERS */
+    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "forbidden", NULL)){
+        glib_group =  username;
+    }else
+        glib_group = "General";
+    if (g_key_file_has_key (gkf, glib_group, "forbidden", NULL)){
+	    config->forbidden_list = g_key_file_get_string_list (gkf, glib_group, "forbidden", &gforbidden_nbr, NULL);
+	    config->forbidden_nbr = gforbidden_nbr;
+    }else {
+        if (config->loglevel >=1) syslog (LOG_NOTICE, "No forbidden list. Setting forbidden to NULL");
+	    config->forbidden_list = NULL;
+	    config->forbidden_nbr = 0;
+    }
+
 
      g_key_file_free (gkf);
 }
