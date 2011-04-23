@@ -302,7 +302,8 @@ void parse_config (config_t* config, char* username){
     if (g_key_file_has_key (gkf, glib_group, "welcome", NULL)){
 	    config->welcome_message = g_key_file_get_string (gkf, glib_group, "welcome", NULL);
         if (config->loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", config->welcome_message);
-    }
+    } else
+	    config->welcome_message = NULL;
 
 
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "allowed", NULL)){
