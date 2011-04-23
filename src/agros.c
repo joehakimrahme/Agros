@@ -153,29 +153,9 @@ void print_help(char** allowed){
 
 void change_directory (char* path, int loglevel){
 
-    char* home;
-
-    if (path == NULL){
-
-        /* Creates the "home" variable containing path to home directory */
-        if ((home = malloc (strlen ("/home/") + strlen (getenv ("USERNAME")) + 1)) == NULL){
-            fprintf (stderr, "Memory allocation error!");
-            exit(EXIT_FAILURE);
-        }
-
-        strcpy (home, "");
-        strcat (home, "/home/");
-        strcat (home, getenv ("USERNAME"));
-
-        /* Copies the "home" temp variable into "path" in order to allow a free() */
-        if ((path = malloc (strlen(home))) == NULL){
-            fprintf (stderr, "Memory allocation error!");
-            exit(EXIT_FAILURE);
-        }
-
-        strcpy (path, home);
-        free (home);
-    }
+    /* If no arguments are given, go to $HOME directory */
+    if (path == NULL)
+        set_homedir (&path);
 
     if (chdir (path) == 0){
         if (loglevel >= 3) syslog (LOG_NOTICE, "Changing to directory: %s.", path);
@@ -323,7 +303,7 @@ void parse_config (config_t* config, char* username){
 }
 
 /*
- * Sets the username, using on getuid() and getpwuid()
+ * Setting variables using getuid() and getpwuid()
  * More info on these functions can easily be found in man pages.
  *
  */
@@ -332,6 +312,13 @@ void set_username (char** pusername){
     pwd = getpwuid (getuid());
     *pusername = pwd->pw_name;
 }
+
+void set_homedir (char** phomedir){
+    struct passwd *pwd = NULL;
+    pwd = getpwuid (getuid());
+    *phomedir = pwd->pw_dir;
+}
+
 
 /***************************************************************************************************************************
 

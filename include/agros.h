@@ -93,4 +93,5 @@ void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
 void    parse_config        (config_t* config, char* username);
 void    set_username        (char** username);
+void    set_homedir         (char** homedir);
 /*void    set_glib_group      (char** glib_group, GKeyFile* gkf, char* username, char* key);*/
