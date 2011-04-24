@@ -312,7 +312,6 @@ void parse_config (config_t* config, char* username){
     else
 	    config->loglevel = 0;
 
-
     /* WELCOME MESSAGE */
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "welcome", NULL)){
         glib_group =  username;
@@ -324,7 +323,6 @@ void parse_config (config_t* config, char* username){
     } else
 	    config->welcome_message = NULL;
 
-
     /* ALLOWED COMMANDS */
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "allowed", NULL)){
         glib_group =  username;
@@ -334,11 +332,10 @@ void parse_config (config_t* config, char* username){
 	    config->allowed_list = g_key_file_get_string_list (gkf, glib_group, "allowed", &gallowed_nbr, NULL);
 	    config->allowed_nbr = gallowed_nbr;
     }else {
-        if (config->loglevel >=1) syslog (LOG_NOTICE, "No allowed list. Setting allowed to NULL");
-	    config->allowed_list = NULL;
-	    config->allowed_nbr = 0;
+        fprintf (stderr, "Cannot launch AGROS; missing allowed list from conf file.\n");
+        if (config->loglevel >=1) syslog (LOG_NOTICE, "Error in conf file, missing allowed list!");
+        exit (EXIT_SUCCESS);
     }
-
 
     /* FORBIDDEN CHARACTERS */
     if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "forbidden", NULL)){
@@ -349,11 +346,10 @@ void parse_config (config_t* config, char* username){
 	    config->forbidden_list = g_key_file_get_string_list (gkf, glib_group, "forbidden", &gforbidden_nbr, NULL);
 	    config->forbidden_nbr = gforbidden_nbr;
     }else {
-        if (config->loglevel >=1) syslog (LOG_NOTICE, "No forbidden list. Setting forbidden to NULL");
-	    config->forbidden_list = NULL;
-	    config->forbidden_nbr = 0;
+        fprintf (stderr, "Cannot launch AGROS; missing parameter from conf file.\n");
+        if (config->loglevel >=1) syslog (LOG_NOTICE, "Error in conf file, missing forbidden list!");
+        exit (EXIT_SUCCESS);
     }
-
 
      g_key_file_free (gkf);
 }

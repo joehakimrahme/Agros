@@ -54,7 +54,7 @@ int main (int argc, char** argv, char** envp){
      *   - or a system command, in which case the program forks and executes it with execvp()
      */
 
-    if (ag_config.welcome_message != NULL) {
+    if (ag_config.welcome_message != NULL && strlen (ag_config.welcome_message) > 0) {
         fprintf (stdout, "\n%s\n\n", ag_config.welcome_message);
     }
 
