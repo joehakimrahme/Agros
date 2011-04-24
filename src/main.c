@@ -36,11 +36,11 @@ int main (int argc, char** argv, char** envp){
     char* username = NULL;
     config_t ag_config;
 
-    /* Opens the syslog file */
-    openlog ("[AGROS]", LOG_PID, LOG_USER);
-
     /* Sets the username */
     set_username (&username);
+
+    /* Opens the syslog file */
+    openlog (username, LOG_PID, LOG_USER);
 
     /* Parses the config files for data */
     parse_config (&ag_config, username);
