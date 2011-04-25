@@ -135,8 +135,8 @@ void print_help(config_t* config){
         fprintf (stdout, "*");
     fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
     fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\n");
-    if (config->allowed_list) print_allowed (config->allowed_list);
-    if (config->forbidden_list != NULL) print_forbidden (config->forbidden_list);
+    print_allowed (config->allowed_list);
+    print_forbidden (config->forbidden_list);
     for (i=0; i<70; i++)
         fprintf (stdout, "*");
     fprintf (stdout, "\n");
