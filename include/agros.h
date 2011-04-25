@@ -90,7 +90,7 @@ void    print_prompt        (char* username);
 void    print_help          (config_t* config);
 void    change_directory    (char* path, int loglevel);
 int     get_cmd_code        (char* cmd_name);
-int     check_validity      (command_t* cmd, char** allowed, char** forbidden);
+int     check_validity      (command_t cmd, config_t config);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
 void    print_forbidden     (char** forbidden);

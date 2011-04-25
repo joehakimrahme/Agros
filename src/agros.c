@@ -193,13 +193,13 @@ int get_cmd_code (char* cmd_name){
  *
  */
 
-int check_validity (command_t* cmd, char** allowed, char** forbidden){
+int check_validity (command_t cmd, config_t config){
     int valid = 1;
     int i = 0, j = 0;
 
     /* Checks if the command name is part of the allowed list */
-    while (allowed[i]){
-	    if (!strcmp (allowed[i], cmd->name) || !strcmp (allowed[i], "*"))
+    while (config.allowed_list[i]){
+	    if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
 	        valid = 0;
 	    i++;
     }
@@ -207,9 +207,9 @@ int check_validity (command_t* cmd, char** allowed, char** forbidden){
     /* Checks that the command line does not include any forbidden character */
     i = 0;
 
-    while (forbidden[i]){
-        for (j=0; j<cmd->argc; j++){
-            if (strstr (cmd->argv[j], forbidden[i]) != NULL)
+    while (config.forbidden_list[i]){
+        for (j=0; j<cmd.argc; j++){
+            if (strstr (cmd.argv[j], config.forbidden_list[i]) != NULL)
                 valid = 1;
         }
 

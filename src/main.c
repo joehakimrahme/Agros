@@ -86,7 +86,7 @@ int main (int argc, char** argv, char** envp){
             case OTHER_CMD:
    	            pid = fork();
    	            if (pid == 0){
-                if (!check_validity (&cmd, ag_config.allowed_list, ag_config.forbidden_list)){
+                if (!check_validity (cmd, ag_config)){
                     if (ag_config.loglevel == 3)  syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
    	        	    execvp (cmd.name, cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
