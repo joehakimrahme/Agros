@@ -76,6 +76,7 @@ struct config_t{
     int forbidden_nbr;
     char* welcome_message;
     int loglevel;
+    int warnings;
 };
 
 /*
@@ -97,4 +98,5 @@ void    print_forbidden     (char** forbidden);
 void    parse_config        (config_t* config, char* username);
 void    set_username        (char** username);
 void    set_homedir         (char** homedir);
+void    decrease_warnings   (config_t* ag_config);
 /*void    set_glib_group      (char** glib_group, GKeyFile* gkf, char* username, char* key);*/

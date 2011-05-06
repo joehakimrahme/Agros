@@ -45,7 +45,6 @@ int main (int argc, char** argv, char** envp){
     /* Parses the config files for data */
     parse_config (&ag_config, username);
 
-
     /*
      *   Main loop:
      *   - print prompt
@@ -59,6 +58,7 @@ int main (int argc, char** argv, char** envp){
     }
 
     while (1){
+
         print_prompt(username);
         read_input (commandline, MAX_LINE_LEN);
         parse_command (commandline, &cmd);
@@ -84,20 +84,20 @@ int main (int argc, char** argv, char** envp){
    	            return 0;
 
             case OTHER_CMD:
-   	            pid = fork();
+                pid = vfork();
    	            if (pid == 0){
                 if (!check_validity (cmd, ag_config)){
-                    if (ag_config.loglevel == 3)  syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
+                    if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
    	        	    execvp (cmd.name, cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                    if (ag_config.loglevel >= 2)  syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
+                    if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
                 }else {
    	        	    fprintf (stdout, "Not allowed! \n");
-                    if (ag_config.loglevel >= 1)  syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
+                    if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
+                    if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
                 }
 
-   	        	kill(getpid(), SIGTERM);
-   	        	break;
+                _exit(EXIT_FAILURE);
    	            }else if (pid < 0){
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
                     if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);

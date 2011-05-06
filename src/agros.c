@@ -351,6 +351,18 @@ void parse_config (config_t* config, char* username){
         exit (EXIT_SUCCESS);
     }
 
+    /* WARNING_NBR */
+    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "warnings", NULL)){
+        glib_group =  username;
+    }else
+        glib_group = "General";
+    if (g_key_file_has_key (gkf, glib_group, "warnings", NULL)){
+	    config->warnings = g_key_file_get_integer (gkf, glib_group, "warnings", NULL);
+        syslog (LOG_NOTICE, "Setting initial warning number to: %d.", config->warnings);
+    }
+    else
+	    config->warnings = -1;
+
      g_key_file_free (gkf);
 }
 
@@ -371,6 +383,17 @@ void set_homedir (char** phomedir){
     *phomedir = pwd->pw_dir;
 }
 
+void decrease_warnings (config_t* ag_config){
+    if (ag_config->warnings > 0){
+        ag_config->warnings--;
+        if (ag_config->warnings >= 0)  fprintf (stdout, "Warnings remaining: %d\n", ag_config->warnings);
+    }else {
+        fprintf (stderr, "Exiting AGROS. The incident will be reported. \n");
+        if (ag_config->loglevel >= 1)    syslog (LOG_NOTICE, "User reached Max warnings. \n");
+        kill (getppid(), SIGTERM);
+        _exit (EXIT_FAILURE);
+    }
+}
 
 /***************************************************************************************************************************
 
