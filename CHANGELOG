@@ -6,6 +6,11 @@ Contact: joe.hakim.rahme@gmail.com
 https://github.com/rahmu/Agros
 
 
+=== agros-0.3.1 08/05/2011 ===
+    * Adds warning parameter
+    * Defines forbidden characters list
+    * Fixes missing keys bug
+
 === agros-0.3.0 23/04/2011 ===
     * Allows users profiles
     * Logs to syslog() according to defined loglevel
