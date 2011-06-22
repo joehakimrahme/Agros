@@ -49,6 +49,7 @@ built_in_commands my_commands[100] = {
     {""     , EMPTY_CMD },
     {"cd"   , CD_CMD    },
     {"env"  , ENV_CMD   },
+    {"help" , HELP_CMD  },
     {"?"    , HELP_CMD  }
 };
 
