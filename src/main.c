@@ -29,7 +29,7 @@
 #include <sys/wait.h>
 #include "agros.h"
 
-int main (int argc, char** argv, char** envp){
+int main (){
     int pid = 0;
     command_t cmd = {NULL, 0, {NULL}};
     char commandline[MAX_LINE_LEN];

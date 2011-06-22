@@ -3,7 +3,7 @@
 
 OBJS= main.o agros.o
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -Wextra -Werror
 
 # Modify the format to suit gcc
 ifdef SYSCONFDIR
