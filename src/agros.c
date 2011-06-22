@@ -76,6 +76,10 @@ void parse_command (char *cmdline, command_t *cmd){
 
     if (word == NULL) { word = ""; } // Fixes blank line bug
 
+    if (cmd->name != NULL){
+        free (cmd->name);
+    }
+
     while (word) {
         cmd->argv[count] = word;
         word = strtok (NULL, WHITESPACE);
