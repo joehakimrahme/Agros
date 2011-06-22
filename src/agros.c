@@ -253,9 +253,13 @@ void print_forbidden (char** forbidden){
     int i=0;
 
     fprintf (stdout, "List of forbidden characters:\n\n");
-    while (forbidden[i]){
-        fprintf (stdout, " * %s\n", forbidden[i]);
-        i++;
+    if (forbidden[0] != NULL){
+        while (forbidden[i]){
+            fprintf (stdout, " * %s\n", forbidden[i]);
+            i++;
+        }
+    } else{
+        fprintf (stdout, " * (none)\n");
     }
 
     fprintf (stdout, "\n");
