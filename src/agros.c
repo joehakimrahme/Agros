@@ -1,3 +1,4 @@
+//
 /*
  *    AGROS - The new Limited Shell
  *
@@ -194,7 +195,6 @@ int get_cmd_code (char* cmd_name){
  * allowed_list is an array of strings, the only commands
  * allowed to use.
  *
- * Function returns 1 if invalid, 0 if valid.
  *
  */
 
@@ -205,7 +205,7 @@ int check_validity (command_t cmd, config_t config){
     /* Checks if the command name is part of the allowed list */
     while (config.allowed_list[i]){
 	    if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
-	        valid = 0;
+	        valid = AG_FALSE;
 	    i++;
     }
 
@@ -215,7 +215,7 @@ int check_validity (command_t cmd, config_t config){
     while (config.forbidden_list[i]){
         for (j=0; j<cmd.argc; j++){
             if (strstr (cmd.argv[j], config.forbidden_list[i]) != NULL)
-                valid = 1;
+                valid = AG_TRUE;
         }
 
         i++;
@@ -402,6 +402,25 @@ void decrease_warnings (config_t* ag_config){
         kill (getppid(), SIGTERM);
         _exit (EXIT_FAILURE);
     }
+}
+
+/*
+ * This function looks for the '&' character.
+ *
+ */
+int runs_in_background (command_t* cmd){
+    int i=0;
+    char* position=NULL;
+
+    for (i=0; i<cmd->argc; i++){
+        position = strchr (cmd->argv[i], '&');
+        if (position){
+            *position = '\0';
+            return AG_TRUE;
+        }
+    }
+
+    return AG_FALSE;
 }
 
 /***************************************************************************************************************************

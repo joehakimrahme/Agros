@@ -32,6 +32,9 @@
 #define ENV_CMD     4
 #define EXIT_CMD    5
 
+#define AG_FALSE 0
+#define AG_TRUE  1
+
 
 /*
  * This structure allows me to handle built-in commands with a switch statement
@@ -99,4 +102,5 @@ void    parse_config        (config_t* config, char* username);
 void    set_username        (char** username);
 void    set_homedir         (char** homedir);
 void    decrease_warnings   (config_t* ag_config);
+int     runs_in_background  (command_t* cmd);
 /*void    set_glib_group      (char** glib_group, GKeyFile* gkf, char* username, char* key);*/

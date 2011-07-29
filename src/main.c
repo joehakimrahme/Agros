@@ -35,6 +35,7 @@ int main (){
     char commandline[MAX_LINE_LEN];
     char* username = NULL;
     config_t ag_config;
+    int bg_cmd = AG_FALSE;
 
     /* Sets the username */
     set_username (&username);
@@ -57,7 +58,7 @@ int main (){
         fprintf (stdout, "\n%s\n\n", ag_config.welcome_message);
     }
 
-    while (1){
+    while (AG_TRUE){
 
         print_prompt(username);
         read_input (commandline, MAX_LINE_LEN);
@@ -84,11 +85,15 @@ int main (){
    	            return 0;
 
             case OTHER_CMD:
+
+                /* Determines whether the command should run in the bg or not */
+                bg_cmd = runs_in_background (&cmd);
                 pid = vfork();
+
    	            if (pid == 0){
                 if (!check_validity (cmd, ag_config)){
                     if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
-   	        	    execvp (cmd.name, cmd.argv);
+                    execvp (cmd.argv[0], cmd.argv);
    	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
                     if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
                 }else {
@@ -102,7 +107,8 @@ int main (){
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
                     if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
    	            }else {
-                    wait (0);
+                    if (!bg_cmd)
+                        wait (0);
    	            }
    	            break;
         }
