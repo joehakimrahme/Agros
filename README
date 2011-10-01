@@ -26,8 +26,8 @@
 
 Latest Release:
 ###############
-    * Release Name: agros-0.3.1
-    * Release Date: 08/05/2011
+    * Release Name: agros-0.3.2
+    * Release Date: 01/10/2011
 
 
 Dependencies:
@@ -40,8 +40,8 @@ Dependencies:
     * libglib2.0-dev
 
 
-Installation:
-#############
+Install:
+########
 
     You can compile the program by running "make". If the dependencies are present,
     it will create a binary executable named "agros" that can be directly runnable.
@@ -60,10 +60,14 @@ Installation:
 Configuration:
 ##############
 
-    There are three variables defined in the agros.conf file.
+    There are five variables defined in the agros.conf file.
 
     - allowed: Gives a list of the allowed commands separated by a semi-colon ";"
+
+    - forbidden: Defines a list of forbidden characters in the command line.
+
     - welcome (optional): Displays a welcome message
+
     - loglevel (optional): Defines the level of log sent to syslog
 
         0- No logging at all (default)
@@ -73,8 +77,6 @@ Configuration:
 
     - warnings (optional): Sets a number of warnings that decreases every time the user
                 enters a forbidden command. When warnings reach 0, AGROS exits.
-
-    - forbidden: Defines a list of forbidden characters in the command line.
 
 
 Contact

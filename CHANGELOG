@@ -6,16 +6,25 @@ Contact: joe.hakim.rahme@gmail.com
 https://github.com/rahmu/Agros
 
 
+=== agros-0.3.2 01/10/2011 ===
+    * Allows launch in background with '&'
+    * Adds 'help' command, similar to '?'
+    * Enhances 'help' output
+    * Fixes memory issues (builtins and cmd struct)
+
+
 === agros-0.3.1 08/05/2011 ===
     * Adds warning parameter
     * Defines forbidden characters list
     * Fixes missing keys bug
+
 
 === agros-0.3.0 23/04/2011 ===
     * Allows users profiles
     * Logs to syslog() according to defined loglevel
     * Makes the welcome message optional
     * Uses getuid() and getpwuid() to retrieve data
+
 
 === agros-0.2.1 28/03/2011 ===
     * Allows the use of "*" in allowed commands.
