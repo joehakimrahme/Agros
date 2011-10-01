@@ -32,6 +32,8 @@
 #define ENV_CMD     4
 #define EXIT_CMD    5
 
+#define CMD_NBR     6
+
 #define AG_FALSE 0
 #define AG_TRUE  1
 

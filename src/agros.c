@@ -42,10 +42,9 @@
  * and their command_code. More explanations can be found in the declaration
  * of the "built_in_commands" structure.
  *
- * TODO: Replace array size (100) by a dynamic allocation.
  */
 
-built_in_commands my_commands[100] = {
+built_in_commands my_commands[CMD_NBR] = {
     {"exit" , EXIT_CMD  },
     {""     , EMPTY_CMD },
     {"cd"   , CD_CMD    },
@@ -183,7 +182,7 @@ void change_directory (char* path, int loglevel){
 
 int get_cmd_code (char* cmd_name){
     int i = 0;
-    for (i=0; i<100; i++){
+    for (i=0; i<CMD_NBR; i++){
 	    if (!strcmp (my_commands[i].command_name, cmd_name))
 	        return my_commands[i].command_code;
     }
