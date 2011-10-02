@@ -25,14 +25,17 @@
 #define MAX_ARGS (MAX_LINE_LEN/2)
 #define WHITESPACE " \t\n"
 
-#define OTHER_CMD   0
-#define EMPTY_CMD   1
-#define CD_CMD      2
-#define HELP_CMD    3
-#define ENV_CMD     4
-#define EXIT_CMD    5
+#define EMPTY_CMD           0
 
-#define CMD_NBR     6
+#define CD_CMD              1
+#define ENV_CMD             2
+#define EXIT_CMD            3
+#define HELP_CMD            4
+#define SHORTHELP_CMD       5
+
+#define OTHER_CMD           6
+
+#define CMD_NBR             7
 
 #define AG_FALSE 0
 #define AG_TRUE  1
@@ -49,6 +52,8 @@ typedef struct built_in_commands built_in_commands;
 struct built_in_commands{
     char command_name[MAX_LINE_LEN];
     int command_code;
+    char command_desc[MAX_LINE_LEN];
+
 };
 
 /*
@@ -93,9 +98,10 @@ struct config_t{
 void    parse_command       (char *cmdline, command_t *cmd);
 int     read_input          (char* string, int num);
 void    print_prompt        (char* username);
-void    print_help          (config_t* config);
+void    print_help          (config_t* config, char* helparg);
 void    change_directory    (char* path, int loglevel);
 int     get_cmd_code        (char* cmd_name);
+char*   get_cmd_desc        (char* cmd_name);
 int     check_validity      (command_t cmd, config_t config);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);

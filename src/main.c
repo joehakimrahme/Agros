@@ -73,7 +73,19 @@ int main (){
    	            break;
 
             case HELP_CMD:
-                print_help(&ag_config);
+                if (cmd.argc > 2)
+                    fprintf (stdout, "Too many arguments\n");
+
+                else if (cmd.argc == 1)
+                    print_help (&ag_config, "-a");
+
+                else
+                    print_help(&ag_config, cmd.argv[1]);
+
+                break;
+
+            case SHORTHELP_CMD:
+                print_help(&ag_config, "-s");
    	            break;
 
             case ENV_CMD:
@@ -91,29 +103,40 @@ int main (){
                 pid = vfork();
 
    	            if (pid == 0){
-                if (!check_validity (cmd, ag_config)){
-                    if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
-                    execvp (cmd.argv[0], cmd.argv);
-   	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                    if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
-                }else {
-   	        	    fprintf (stdout, "Not allowed! \n");
-                    if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
-                    if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
-                }
+                    if (!check_validity (cmd, ag_config)){
 
-                _exit(EXIT_FAILURE);
+                        if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
+                        execvp (cmd.argv[0], cmd.argv);
+
+                        fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+                        if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
+
+                    }else {
+
+                        fprintf (stdout, "Not allowed! \n");
+
+                        if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
+                        if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
+                    }
+
+                    _exit(EXIT_FAILURE);
+
    	            }else if (pid < 0){
+
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
                     if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
+
    	            }else {
+
                     if (!bg_cmd)
                         wait (0);
+
    	            }
    	            break;
         }
     }
 
     closelog();
+
     return 0;
 }

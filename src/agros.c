@@ -45,12 +45,12 @@
  */
 
 built_in_commands my_commands[CMD_NBR] = {
-    {"exit" , EXIT_CMD  },
-    {""     , EMPTY_CMD },
-    {"cd"   , CD_CMD    },
-    {"env"  , ENV_CMD   },
-    {"help" , HELP_CMD  },
-    {"?"    , HELP_CMD  }
+    {""     , EMPTY_CMD         , ""},
+    {"cd"   , CD_CMD            , "change directory"},
+    {"env"  , ENV_CMD           , "print enviroment. Can show single variable"},
+    {"exit" , EXIT_CMD          , "exit from AGROS"},
+    {"help" , HELP_CMD          , "print help"},
+    {"?"    , SHORTHELP_CMD     , "print short help"}
 };
 
 
@@ -131,21 +131,47 @@ void print_prompt (char* username){
  * TODO: Store my string messages (help + error messages) in a separate file.
  */
 
-void print_help(config_t* config){
+void print_help(config_t* config, char* helparg){
     int i =0;
 
-    fprintf (stdout, "\n");
-    fprintf (stdout, "\n");
-    for (i=0; i<70; i++)
-        fprintf (stdout, "*");
-    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
-    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\n");
-    print_allowed (config->allowed_list);
-    print_forbidden (config->forbidden_list);
-    for (i=0; i<70; i++)
-        fprintf (stdout, "*");
-    fprintf (stdout, "\n");
-    fprintf (stdout, "\n");
+    if (!strcmp (helparg, "-b")){
+
+        for (i=0; i<CMD_NBR; i++){
+
+            if (my_commands[i].command_code != OTHER_CMD
+                && my_commands[i].command_code != EMPTY_CMD)
+
+                fprintf (stdout, "%s\t:%s\n", my_commands[i].command_name,
+                                              my_commands[i].command_desc);
+        }
+
+    }else if (!strcmp (helparg, "-a")){
+
+        fprintf (stdout, "\n\n");
+
+        for (i=0; i<70; i++)
+            fprintf (stdout, "*");
+
+        fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
+        fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\n");
+
+        print_allowed (config->allowed_list);
+        print_forbidden (config->forbidden_list);
+
+        for (i=0; i<80; i++)
+            fprintf (stdout, "*");
+
+        fprintf (stdout, "\n\n");
+
+    }else if (!strcmp (helparg, "-s")){
+
+        print_allowed (config->allowed_list);
+        print_forbidden (config->forbidden_list);
+
+    } else
+
+        fprintf (stdout, "Unkown option %s\n", helparg);
+
 }
 
 /*
@@ -176,7 +202,7 @@ void change_directory (char* path, int loglevel){
 
 /*
  * This function access the global array variable my_commands
- * and returns the command_code eauivalent to each command.
+ * and returns the command_code equivalent to each command.
  *
  */
 
@@ -187,6 +213,21 @@ int get_cmd_code (char* cmd_name){
 	        return my_commands[i].command_code;
     }
     return OTHER_CMD;
+}
+
+/*
+ * This function access the global array variable my_commands
+ * and returns the equivalent command_desc vaule.
+ *
+ */
+
+char* get_cmd_desc (char* cmd_name){
+    int i = 0;
+    for (i=0; i<CMD_NBR; i++){
+	    if (!strcmp (my_commands[i].command_name, cmd_name))
+	        return my_commands[i].command_desc;
+    }
+    return "";
 }
 
 /*
