@@ -42,6 +42,9 @@ ifdef SYSCONF
 else
 	$(CC) $(CFLAGS) -c -I include/ `pkg-config --cflags glib-2.0` src/agros.c
 endif
+
+smags: src/smag_main.c
+	$(CC) $(CFLAGS) -I include/ src/smag_main.c -o smags -L lib/iniparser -liniparser -I lib/iniparser/src
 	
 # PHONY RULES
 #############

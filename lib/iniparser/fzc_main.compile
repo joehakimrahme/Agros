@@ -1,0 +1,1 @@
+gcc -g -I./src -o main main.c -liniparser -L. -Wl,-rpath,/home/rahmu/code/AGROS
