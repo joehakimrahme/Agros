@@ -3,62 +3,59 @@
 #include <string.h>
 
 #include "iniparser.h"
+#include "agros.h"
 
 #define CONF_FILE "agros.conf"
 #define BASEGRP "General"
-#define LEN 100
 
-char *smags_get_key (dictionary *dict, char *group, char* key);
-char *smags_get_iniparserkey (char* group, char* key);
+
+
+char* get_inipkey (char* sec, char* key)
+{
+    size_t length = strlen (sec) + strlen (key) + 1;
+    char* inipkey = (char *)malloc (length);
+
+    sprintf (inipkey, "%s:%s", sec, key);
+
+    return inipkey;
+}
+
+int sec_haskey (dictionary *dict, char* section, char* key){
+    return iniparser_find_entry (dict, get_inipkey (section, key));
+}
+
+
+char *ag_get_agkey (dictionary *dict, char* conf_group, char* conf_groupkey, char* conf_defgroup){
+    /* Checks in group section
+     */
+    if (sec_haskey (dict, conf_group, conf_groupkey))
+        return get_inipkey (conf_group, conf_groupkey);
+
+        /* Checks in default section
+         */
+     else if (sec_haskey (dict, conf_defgroup, conf_groupkey))
+        return get_inipkey (conf_defgroup, conf_groupkey);
+
+        /* Key is not found
+         *
+         * - Should I log something?
+         * - Is NULL a good return value?
+         */
+         else
+            return NULL;
+
+}
+
+
 
 int main()
 {
-    dictionary *dict = (dictionary *)malloc (sizeof (dictionary));
-    char *key = NULL;
+    dictionary *conf_dict = (dictionary *)malloc (sizeof (dictionary));
+    conf_dict = iniparser_load (CONF_FILE);
 
-    dict = iniparser_load (CONF_FILE);
+    char* ag_agkey = ag_get_agkey (conf_dict, "rot", "allowed", BASEGRP);
 
-    key = smags_get_key (dict, "root", "allowed");
-    printf ("%s\n", key);
-    key = smags_get_key (dict, "root", "forbidden");
-    printf ("%s\n", key);
+    printf ("%s\n", iniparser_getstring (conf_dict, ag_agkey, AG_FALSE));
 
     return EXIT_SUCCESS;
-}
-
-char *smags_get_iniparserkey (char* group, char* key)
-{
-    char *smags_fullkey = NULL;;
-    int fullkey_len = 0;
-    char *sep = ":";
-
-    fullkey_len = strlen(group) + strlen (key) + strlen (sep);
-    smags_fullkey = (char *) malloc (sizeof (char) * fullkey_len);
-    
-    strcpy (smags_fullkey, group);
-    strcat (smags_fullkey, sep);
-    strcat (smags_fullkey, key);
-
-    return smags_fullkey;
-}
-
-
-
-char *smags_get_key (dictionary *dict, char *group, char* key)
-{
-    char *smags_fullkey = NULL;
-
-    smags_fullkey = smags_get_iniparserkey (group, key);
-
-    if (iniparser_find_entry (dict, smags_fullkey)){
-        return smags_fullkey;
-    }
-    else
-    {
-        smags_fullkey = smags_get_iniparserkey (BASEGRP, key);
-        if (iniparser_find_entry (dict, smags_fullkey))
-            return smags_fullkey;
-    }
-        
-    return NULL;
 }
