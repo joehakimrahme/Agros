@@ -1,4 +1,3 @@
-//
 /*
  *    AGROS - The new Limited Shell
  *
@@ -54,11 +53,6 @@ built_in_commands my_commands[CMD_NBR] = {
 };
 
 
-
-/* This variable contains the environment. I use it in my "env" built-in
-   function */
-extern char** environ;
-
 /*
  * This function parses a string and fills a command_t struct.
  * It uses the strtok() to split the string into tokens. Then it fills the argv
@@ -95,7 +89,7 @@ void parse_command (char *cmdline, command_t *cmd){
 
 
 /*
- * Reads the input using fgets (don't use scanf!!!)
+ * Reads the input using fgets
  */
 
 int read_input (char* string, int num){
@@ -107,10 +101,10 @@ int read_input (char* string, int num){
 	    if (CRPosition)
 	        *CRPosition = '\0';
 
-	    return 1;
+	    return AG_TRUE;
 
     }else
-	    return 0;
+	    return AG_FALSE;
 }
 
 
@@ -123,7 +117,28 @@ int read_input (char* string, int num){
  */
 
 void print_prompt (char* username){
-    fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
+//    char *var = "Testing(#l)";
+    char *var = "AGROS";
+    char *promptstring = NULL;
+    size_t length  = 0;
+    int i=0;
+
+    length = strlen ("[]:$ ") + strlen (username) + strlen (getenv ("PWD"));
+
+
+
+    if (strlen (var) + length > MAX_LINE_LEN -1)
+    {
+        printf ("Error: prompt too long");
+        _exit(EXIT_FAILURE);
+    }
+
+    promptstring = (char *)malloc (sizeof (char) * MAX_LINE_LEN);
+
+    sprintf (promptstring, "[%s]%s:%s$ ", var, username, getenv ("PWD"));
+    fprintf (stdout, "%s", promptstring);
+
+    free (promptstring);
 }
 
 /*

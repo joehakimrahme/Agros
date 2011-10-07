@@ -84,6 +84,11 @@ struct config_t{
     int warnings;
 };
 
+
+/* This variable contains the environment. I use it in my "env" built-in
+   function */
+extern char** environ;
+
 /*
  * These are the functions called by AGROS. These declarations are pretty explicit.
  * More detailed comments can be found in source files.
