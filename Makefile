@@ -1,7 +1,7 @@
 # VARIABLE DECLARATION
 ######################
 
-OBJS= main.o agros.o
+OBJS=  smag_main.o main.o agros.o
 CC=gcc
 CFLAGS=-Wall -Wextra -Werror
 
@@ -20,7 +20,7 @@ endif
 	
 # Default Rule. It all starts here
 agros: $(OBJS)
-	$(CC) $(CFLAGS) `pkg-config --libs glib-2.0` -o agros $(OBJS)
+	$(CC) $(CFLAGS) -L lib/iniparser -liniparser -o agros $(OBJS)
 	rm -f $(OBJS)
 	
 # Moves the executable to TARGETDIR if defined
@@ -33,18 +33,18 @@ ifdef SYSCONFDIR
 	cp agros.conf $(SYSCONFDIR)
 endif
 	
-main.o: agros.o include/agros.h
-	$(CC) $(CFLAGS) -c -I include/ src/main.c
+main.o: agros.o smag_main.o src/main.c include/agros.h include/smags.h
+	$(CC) $(CFLAGS) -c -I include/ -L lib/iniparser -liniparser -I lib/iniparser/src src/main.c
 	
-agros.o: src/agros.c include/agros.h
+agros.o: smag_main.o src/agros.c include/agros.h include/smags.h
 ifdef SYSCONF
-	$(CC) $(CFLAGS) -c -I include/ `pkg-config --cflags glib-2.0` -DCONFIG_FILE=$(SYSCONF) src/agros.c
+	$(CC) $(CFLAGS) -c -I include/ -L lib/iniparser -liniparser -I lib/iniparser/src -DCONFIG_FILE=$(SYSCONF) src/agros.c
 else
-	$(CC) $(CFLAGS) -c -I include/ `pkg-config --cflags glib-2.0` src/agros.c
+	$(CC) $(CFLAGS) -c -I include/ -L lib/iniparser -liniparser -I lib/iniparser/src src/agros.c
 endif
 
-smags: src/smag_main.c
-	$(CC) $(CFLAGS) -I include/ src/smag_main.c -o smags -L lib/iniparser -liniparser -I lib/iniparser/src
+smag_main.o: src/smag_main.c include/smags.h
+	$(CC) $(CFLAGS) -c -I include/ src/smag_main.c -L lib/iniparser -liniparser -I lib/iniparser/src
 	
 # PHONY RULES
 #############

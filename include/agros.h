@@ -75,21 +75,6 @@ struct command_t{
 
 
 /*
- * A structure that holds the AGROS conf.
- */
-
-typedef struct config_t config_t;
-struct config_t{
-    char** allowed_list;
-    char** forbidden_list;
-    int allowed_nbr;
-    int forbidden_nbr;
-    char* welcome_message;
-    int loglevel;
-    int warnings;
-};
-
-/*
  * These are the functions called by AGROS. These declarations are pretty explicit.
  * More detailed comments can be found in source files.
  *
@@ -106,9 +91,7 @@ int     check_validity      (command_t cmd, config_t config);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
 void    print_forbidden     (char** forbidden);
-void    parse_config        (config_t* config, char* username);
 void    set_username        (char** username);
 void    set_homedir         (char** homedir);
 void    decrease_warnings   (config_t* ag_config);
 int     runs_in_background  (command_t* cmd);
-/*void    set_glib_group      (char** glib_group, GKeyFile* gkf, char* username, char* key);*/

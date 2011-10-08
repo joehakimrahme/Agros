@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <sys/wait.h>
+
+#include "smags.h"
 #include "agros.h"
 
 int main (){
@@ -34,7 +36,7 @@ int main (){
     command_t cmd = {NULL, 0, {NULL}};
     char commandline[MAX_LINE_LEN];
     char* username = NULL;
-    config_t ag_config;
+    config_t ag_config = {NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0};
     int bg_cmd = AG_FALSE;
 
     /* Sets the username */

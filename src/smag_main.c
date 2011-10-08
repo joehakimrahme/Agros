@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "iniparser.h"
-#include "agros.h"
+#include "smags.h"
 
 #define CONF_FILE "agros.conf"
 #define BASEGRP "General"
@@ -46,16 +46,28 @@ char *ag_get_agkey (dictionary *dict, char* conf_group, char* conf_groupkey, cha
 
 }
 
-
-
-int main()
-{
+void parse_config (config_t* config, char* username){
     dictionary *conf_dict = (dictionary *)malloc (sizeof (dictionary));
     conf_dict = iniparser_load (CONF_FILE);
 
-    char* ag_agkey = ag_get_agkey (conf_dict, "rot", "allowed", BASEGRP);
+    config->loglevel = iniparser_getint (conf_dict, ag_get_agkey (conf_dict, username, "loglevel", BASEGRP), 0);
+    config->welcome_message = iniparser_getstring (conf_dict, ag_get_agkey (conf_dict, username, "welcome", BASEGRP), "");
 
-    printf ("%s\n", iniparser_getstring (conf_dict, ag_agkey, AG_FALSE));
+    config->_allowed_string = iniparser_getstring (conf_dict, ag_get_agkey (conf_dict, username, "allowed", BASEGRP), "");
 
-    return EXIT_SUCCESS;
+    config->allowed_list = (char **)malloc (sizeof (char *));
+
+
+    config->allowed_list = &config->_allowed_string;
+
+
+    config->_forbidden_string = iniparser_getstring (conf_dict, ag_get_agkey (conf_dict, username, "forbidden", BASEGRP), "");
+
+    config->forbidden_list = (char **)malloc (sizeof (char *));
+    config->forbidden_list = &config->_forbidden_string;
+
+    config->warnings = iniparser_getint (conf_dict, ag_get_agkey (conf_dict, username, "warnings", BASEGRP), 0);
+
+    iniparser_freedict(conf_dict);
+
 }

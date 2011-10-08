@@ -28,9 +28,11 @@
 #include <unistd.h>
 #include <assert.h>
 #include <syslog.h>
-#include <glib.h>
 #include <pwd.h>
 #include <sys/types.h>
+#include <signal.h>
+
+#include "smags.h"
 #include "agros.h"
 
 #ifndef CONFIG_FILE
@@ -95,7 +97,7 @@ void parse_command (char *cmdline, command_t *cmd){
 
 
 /*
- * Reads the input using fgets (don't use scanf!!!)
+ * Reads the input using fgets
  */
 
 int read_input (char* string, int num){
@@ -117,8 +119,6 @@ int read_input (char* string, int num){
 /*
  * Modifiy this function to modify the prompt. Ultimately, I want to define the prompt
  * inside the conf file à la bash.
- *
- * Some systems use USERNAME, others use USER. Hence the ugly if.
  *
  */
 
@@ -324,95 +324,6 @@ void print_allowed (char** allowed){
         fprintf (stdout, "\n");
     } else
         fprintf (stdout, " * (all)\n\n");
-}
-
-/*
- * EFFECTS: parses CONFIG_FILE.
- * MODIFIES: allowed_list, allowed_nbr, welcome_message, loglevel
- */
-
-void parse_config (config_t* config, char* username){
-    GKeyFile* gkf;
-    gsize gallowed_nbr;
-    gsize gforbidden_nbr;
-    char* glib_group = NULL;
-
-    gkf = g_key_file_new ();
-
-    /* Loads the file into gkf */
-    if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-	    fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-        syslog (LOG_ERR, "Could not read config file: %s.", CONFIG_FILE);
-        closelog ();
-	    exit (EXIT_FAILURE);
-    }
-
-    /* If the file exists and is loaded, we proceed to parsing it */
-
-    /* LOGLEVEL */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "loglevel", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "loglevel", NULL)){
-	    config->loglevel = g_key_file_get_integer (gkf, glib_group, "loglevel", NULL);
-        syslog (LOG_NOTICE, "Setting log level to: %d.", config->loglevel);
-    }
-    else
-	    config->loglevel = 0;
-
-    /* WELCOME MESSAGE */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "welcome", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "welcome", NULL)){
-	    config->welcome_message = g_key_file_get_string (gkf, glib_group, "welcome", NULL);
-        if (config->loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", config->welcome_message);
-    } else
-	    config->welcome_message = NULL;
-
-    /* ALLOWED COMMANDS */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "allowed", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "allowed", NULL)){
-	    config->allowed_list = g_key_file_get_string_list (gkf, glib_group, "allowed", &gallowed_nbr, NULL);
-	    config->allowed_nbr = gallowed_nbr;
-    }else {
-        fprintf (stderr, "Cannot launch AGROS; missing allowed list from conf file.\n");
-        if (config->loglevel >=1) syslog (LOG_NOTICE, "Error in conf file, missing allowed list!");
-        exit (EXIT_SUCCESS);
-    }
-
-    /* FORBIDDEN CHARACTERS */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "forbidden", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "forbidden", NULL)){
-	    config->forbidden_list = g_key_file_get_string_list (gkf, glib_group, "forbidden", &gforbidden_nbr, NULL);
-	    config->forbidden_nbr = gforbidden_nbr;
-    }else {
-        fprintf (stderr, "Cannot launch AGROS; missing parameter from conf file.\n");
-        if (config->loglevel >=1) syslog (LOG_NOTICE, "Error in conf file, missing forbidden list!");
-        exit (EXIT_SUCCESS);
-    }
-
-    /* WARNING_NBR */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "warnings", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "warnings", NULL)){
-	    config->warnings = g_key_file_get_integer (gkf, glib_group, "warnings", NULL);
-        syslog (LOG_NOTICE, "Setting initial warning number to: %d.", config->warnings);
-    }
-    else
-	    config->warnings = -1;
-
-     g_key_file_free (gkf);
 }
 
 /*
