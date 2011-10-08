@@ -48,6 +48,7 @@ int main (){
     /* Parses the config files for data */
     parse_config (&ag_config, username);
 
+
     /*
      *   Main loop:
      *   - print prompt

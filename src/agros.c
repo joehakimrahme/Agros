@@ -73,7 +73,7 @@ extern char** environ;
 
 void parse_command (char *cmdline, command_t *cmd){
     int count = 0;
-    char* word;
+    char* word = NULL;
 
     word = strtok (cmdline, WHITESPACE);
 
