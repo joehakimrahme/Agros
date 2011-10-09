@@ -91,7 +91,8 @@ struct config_t{
  */
 
 void    parse_command       (char *cmdline, command_t *cmd);
-int     read_input          (char* string, int num);
+void	get_prompt	    (char *prompt, int length, char *username);
+char*	read_input	    (char *prompt);
 void    print_prompt        (char* username);
 void    print_help          (config_t* config);
 void    change_directory    (char* path, int loglevel);
@@ -106,3 +107,8 @@ void    set_homedir         (char** homedir);
 void    decrease_warnings   (config_t* ag_config);
 int     runs_in_background  (command_t* cmd);
 /*void    set_glib_group      (char** glib_group, GKeyFile* gkf, char* username, char* key);*/
+void	initialize_readline (config_t *config);
+char*	make_completion	    (char *string);
+char**	cmd_completion	    (const char *text, int start, int end);
+char*	cmd_generator	    (const char *text, int state);
+
