@@ -1,4 +1,3 @@
-//
 /*
  *    AGROS - The new Limited Shell
  *
@@ -35,9 +34,14 @@
 #include "smags.h"
 #include "agros.h"
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
+/*
 #ifndef CONFIG_FILE
 #define CONFIG_FILE "agros.conf"
 #endif
+*/
 
 /*
  * A global array holding the associations between each built-in command
@@ -51,11 +55,16 @@ built_in_commands my_commands[CMD_NBR] = {
     {"cd"   , CD_CMD            , "change directory"},
     {"env"  , ENV_CMD           , "print enviroment. Can show single variable"},
     {"exit" , EXIT_CMD          , "exit from AGROS"},
-    {"help" , HELP_CMD          , "print help"},
+    {"hep" , HELP_CMD          , "print help"},
     {"?"    , SHORTHELP_CMD     , "print short help"}
 };
 
-
+/*
+ * A reference to the list and number of allowed commands.
+ * This list is used when autocompleting commands.
+ */
+char **allowed_list = (char **)NULL;
+int allowed_nbr = 0;
 
 /* This variable contains the environment. I use it in my "env" built-in
    function */
@@ -95,26 +104,25 @@ void parse_command (char *cmdline, command_t *cmd){
     strcpy (cmd->name, cmd->argv[0]);
 }
 
-
 /*
- * Reads the input using fgets
+ * Reads the input using GNU Readline.
+ * Saves each input in a history list.
+ * - prompt: The prompt to display when asking for input.
+ * The result is dynamically allocated and should 
+ * be cleaned up with free().
  */
 
-int read_input (char* string, int num){
-    char* CRPosition = NULL;
+char *read_input (char *prompt)
+{
+    char *result;
+    result  = readline(prompt);
 
-    if (fgets (string, num, stdin)){
-	    CRPosition = strchr (string, '\n');
+    /* Add the line to the history if it's valid and non-empty */
+    if (result  && *result)
+        add_history(result);
 
-	    if (CRPosition)
-	        *CRPosition = '\0';
-
-	    return 1;
-
-    }else
-	    return 0;
+    return result;
 }
-
 
 /*
  * Modifiy this function to modify the prompt. Ultimately, I want to define the prompt
@@ -124,6 +132,17 @@ int read_input (char* string, int num){
 
 void print_prompt (char* username){
     fprintf (stdout, "[AGROS]%s:%s$ ", username, getenv ("PWD"));
+}
+
+/*
+ * Prints the prompt to the given string.
+ * - prompt: The string that will contain the prompt
+ * - length: The maximum length of the prompt
+ * - username: The username to display
+ */
+void get_prompt (char *prompt, int length, char *username)
+{
+    snprintf(prompt, length, "[AGROS]%s:%s$ ", username, getenv("PWD"));
 }
 
 /*
@@ -209,8 +228,8 @@ void change_directory (char* path, int loglevel){
 int get_cmd_code (char* cmd_name){
     int i = 0;
     for (i=0; i<CMD_NBR; i++){
-	    if (!strcmp (my_commands[i].command_name, cmd_name))
-	        return my_commands[i].command_code;
+        if (!strcmp (my_commands[i].command_name, cmd_name))
+            return my_commands[i].command_code;
     }
     return OTHER_CMD;
 }
@@ -224,8 +243,8 @@ int get_cmd_code (char* cmd_name){
 char* get_cmd_desc (char* cmd_name){
     int i = 0;
     for (i=0; i<CMD_NBR; i++){
-	    if (!strcmp (my_commands[i].command_name, cmd_name))
-	        return my_commands[i].command_desc;
+        if (!strcmp (my_commands[i].command_name, cmd_name))
+            return my_commands[i].command_desc;
     }
     return "";
 }
@@ -244,9 +263,9 @@ int check_validity (command_t cmd, config_t config){
 
     /* Checks if the command name is part of the allowed list */
     while (config.allowed_list[i]){
-	    if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
-	        valid = AG_FALSE;
-	    i++;
+        if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
+            valid = AG_FALSE;
+        i++;
     }
 
     /* Checks that the command line does not include any forbidden character */
@@ -274,14 +293,14 @@ void print_env (char* env_variable){
     char** var = NULL;
 
     if (env_variable != NULL){
-	    env_value = getenv(env_variable);
-	    if (env_value)
-	        fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
-	    else
-	        fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
+        env_value = getenv(env_variable);
+        if (env_value)
+            fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
+        else
+            fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
     }else {
-	    for (var = environ; *var != NULL; ++var)
-	        fprintf (stdout, "%s\n", *var);
+        for (var = environ; *var != NULL; ++var)
+            fprintf (stdout, "%s\n", *var);
     }
 }
 
@@ -318,8 +337,8 @@ void print_allowed (char** allowed){
     fprintf (stdout, "List of allowed actions:\n\n");
     if (strcmp (allowed[0],"*")){
         while (allowed[i]){
-	        fprintf (stdout, " * %s\n", allowed[i]);
-	        i++;
+            fprintf (stdout, " * %s\n", allowed[i]);
+            i++;
         }
         fprintf (stdout, "\n");
     } else
@@ -374,13 +393,111 @@ int runs_in_background (command_t* cmd){
     return AG_FALSE;
 }
 
-/***************************************************************************************************************************
+/*
+ * Readline functionality
+ */
 
-void set_glib_group (char** glib_group, GKeyFile* gkf, char* username, char* key){
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, key, NULL)){
-        *glib_group =  username;
-    }else
-        *glib_group = "General";
+/*
+ * Set up autocompletion and history using GNU Readline
+ * - config: The AGROS configuration to use when autocompleting.
+ */
+void initialize_readline(config_t *config)
+{
+    /* Can be used for customization in the future */
+    rl_readline_name = "AGROS";
+
+    /* The function to call before default autocompletion kicks in */
+    rl_attempted_completion_function = cmd_completion;
+
+    /* Get a handle to the list of allowed commands and its length
+     * This allows us to autocomplete these as well.
+     */
+    allowed_list = config->allowed_list;
+    allowed_nbr = config->allowed_nbr;
 }
 
-***************************************************************************************************************************/
+/*
+ * This function is automatically called by GNU Readline
+ * when autocompleting.
+ * - text: The text the user has entered.
+ * - start: An index to the start of the text in the input buffer.
+ * - end: An index to the end of the text in the input buffer.
+ */
+char **cmd_completion(const char *text, int start, int end)
+{
+    char **matches = (char **)NULL;
+    
+    /* Making sure end is used, not really useful for anything */
+    if (end == 0) {
+    ;
+    }
+
+    /* 
+     * We're at the beginning of the buffer, so we should match
+     * built-in functions and commands. Otherwise, readline will
+     * automatically match file names
+     */
+    if (start == 0)
+    matches = rl_completion_matches(text, cmd_generator);
+
+    return matches;
+}
+
+/*
+ * Dynamically allocates a string and returns a pointer to it.
+ * - string: The string to copy into the new location
+ */
+char *make_completion(char *string)
+{
+    char *result = (char *)NULL;
+    int length= strlen(string) + 1;
+    result = malloc(length);
+    if (result)
+    strncpy(result, string, length);
+
+    return result;
+}
+
+/*
+ * Searches built-in functions and allowed commands 
+ * for matches to currently entered text.
+ * - text: The text to match.
+ * - state: Indicates the status of the search.
+ *   When state is 0, this function is being called 
+ *   in a new autocompletion, and it should start a 
+ *   new search.
+ */
+char *cmd_generator(const char *text, int state)
+{
+    static int cmd_index;
+    static int allowed_index;
+    static int length;
+
+    char *value = (char *)NULL;
+
+    /* Prepare a new search for matches */
+    if (state == 0) {
+        cmd_index = 0;
+        allowed_index = 0;
+        length = strlen(text);
+    }
+
+    /* Check the list of built-in functions for a match */
+    while (cmd_index < CMD_NBR) {
+        value = my_commands[cmd_index].command_name;
+        cmd_index++;
+        if (strncmp(value, text, length) == 0)
+            return make_completion(value);
+    }
+
+    /* Check the list of allowed commands for a match */
+    while (allowed_index < allowed_nbr) {
+        value = allowed_list[allowed_index];
+        allowed_index++;
+        if (strncmp(value, text, length) == 0)
+            return make_completion(value);
+    }
+
+    /* No matches were found. */
+    return (char *)NULL;
+}

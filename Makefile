@@ -20,7 +20,7 @@ endif
 	
 # Default Rule. It all starts here
 agros: $(OBJS)
-	$(CC) $(CFLAGS) -L lib/iniparser -liniparser -o agros $(OBJS)
+	$(CC) $(CFLAGS) -lreadline -L lib/iniparser -liniparser -o agros $(OBJS)
 	rm -f $(OBJS)
 	
 # Moves the executable to TARGETDIR if defined
@@ -38,9 +38,9 @@ main.o: agros.o smag_main.o src/main.c include/agros.h include/smags.h
 	
 agros.o: smag_main.o src/agros.c include/agros.h include/smags.h
 ifdef SYSCONF
-	$(CC) $(CFLAGS) -c -I include/ -L lib/iniparser -liniparser -I lib/iniparser/src -DCONFIG_FILE=$(SYSCONF) src/agros.c
+	$(CC) $(CFLAGS) -c -I include/ -lreadline -L lib/iniparser -liniparser -I lib/iniparser/src -DCONFIG_FILE=$(SYSCONF) src/agros.c
 else
-	$(CC) $(CFLAGS) -c -I include/ -L lib/iniparser -liniparser -I lib/iniparser/src src/agros.c
+	$(CC) $(CFLAGS) -c -I include/ -lreadline -L lib/iniparser -liniparser -I lib/iniparser/src src/agros.c
 endif
 
 smag_main.o: src/smag_main.c include/smags.h
