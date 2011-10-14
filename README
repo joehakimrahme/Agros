@@ -42,7 +42,15 @@ Dependencies:
 Install:
 --------
 
-    You can compile the program by running "make". If the dependencies are present,
+    First thing you need to do is to compile iniparser. From your top directory do the
+    following:
+
+    $ cd lib/iniparser
+    $ make
+    $ ln libiniparser.so.0 libiniparser
+
+
+    You can then compile the program by running "make". If the dependencies are present,
     it will create a binary executable named "agros" that can be directly runnable.
 
     If make is called without any arguments, then agros will look for a file called
