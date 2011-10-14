@@ -1,6 +1,4 @@
-##################################
 #  AGROS - The New Limited Shell #
-##################################
 
     AGROS is my implementation in C of the Limited Shell (lshell). Lshell is a project
     developed by ghantoos (mouzannar@gmail.com), The project consists of a UNIX shell
@@ -19,29 +17,30 @@
     This is why AGROS is rightfully named AGROS Got Rid Of the Snake. I'm pretty
     proud of that name :)
 
-    The way it works is that the administrator defines a certain list of commands the user
-    can execute. It's a restrictive shell used for security puproses.
+    AGROS has a submodule called SMAGS, that recently replaced the use of GLib for
+    parsing the conf file. SMAGS is based on the 'iniparser' library written by
+    ndevilla. Here's a link to the original project:
+
+    http://ndevilla.free.fr/iniparser/
 
 
 
 Latest Release:
-###############
+---------------
+
     * Release Name: agros-0.3.2
     * Release Date: 01/10/2011
 
 
 Dependencies:
-############
+------------
 
-    These are available as packaged binaries for Debian. I haven't tried them on
-    other Unices.
+    Only one so far. I want to keep them as little as possible.
 
-    * pkg-config
-    * libglib2.0-dev
-
+    * libreadline6-dev
 
 Install:
-########
+--------
 
     You can compile the program by running "make". If the dependencies are present,
     it will create a binary executable named "agros" that can be directly runnable.
@@ -58,7 +57,7 @@ Install:
 
 
 Configuration:
-##############
+--------------
 
     There are five variables defined in the agros.conf file.
 
@@ -80,10 +79,9 @@ Configuration:
 
 
 Contact
-#######
+-------
 
-    If you want to contribute to this project, please do not hesitate.
-    Since the project is still at its infancy, it'd be better if you contacted me
-    at my email address:
+    If you want to contribute to this project, please do not hesitate to send me comments
+    or code patchs at my email adress:
 
     Joe "rahmu" HAKIM RAHME <joe.hakim.rahme@gmail.com>
