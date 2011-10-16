@@ -51,12 +51,13 @@
  */
 
 built_in_commands my_commands[CMD_NBR] = {
-    {""     , EMPTY_CMD         , ""},
-    {"cd"   , CD_CMD            , "change directory"},
-    {"env"  , ENV_CMD           , "print enviroment. Can show single variable"},
-    {"exit" , EXIT_CMD          , "exit from AGROS"},
-    {"hep" , HELP_CMD          , "print help"},
-    {"?"    , SHORTHELP_CMD     , "print short help"}
+    {""         , EMPTY_CMD         , ""},
+    {"cd"       , CD_CMD            , "change directory"},
+    {"env"      , ENV_CMD           , "print enviroment."},
+    {"exit"     , EXIT_CMD          , "exit from AGROS"},
+    {"help"     , HELP_CMD          , "print help"},
+    {"setenv"   , SETENV_CMD        , "modify the environment"},
+    {"?"        , SHORTHELP_CMD     , "print short help"}
 };
 
 /*
@@ -453,7 +454,7 @@ char *make_completion(char *string)
     int length= strlen(string) + 1;
     result = malloc(length);
     if (result)
-    strncpy(result, string, length);
+        strncpy(result, string, length);
 
     return result;
 }
@@ -500,4 +501,15 @@ char *cmd_generator(const char *text, int state)
 
     /* No matches were found. */
     return (char *)NULL;
+}
+
+int ag_setenv (char *line){
+
+    char *_value = strdup(line);
+    char *_variable = strsep(&_value, "=");
+
+    if (_value)
+        setenv (_variable, _value, 1);
+
+    return EXIT_SUCCESS;
 }

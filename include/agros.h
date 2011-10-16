@@ -32,10 +32,11 @@
 #define EXIT_CMD            3
 #define HELP_CMD            4
 #define SHORTHELP_CMD       5
+#define SETENV_CMD          6
 
-#define OTHER_CMD           6
+#define OTHER_CMD           7
 
-#define CMD_NBR             7
+#define CMD_NBR             8
 
 #define AG_FALSE 0
 #define AG_TRUE  1
@@ -81,8 +82,8 @@ struct command_t{
  */
 
 void    parse_command       (char *cmdline, command_t *cmd);
-void	get_prompt	    (char *prompt, int length, char *username);
-char*	read_input	    (char *prompt);
+void	get_prompt          (char *prompt, int length, char *username);
+char*	read_input          (char *prompt);
 void    print_prompt        (char* username);
 void    print_help          (config_t* config, char* helparg);
 void    change_directory    (char* path, int loglevel);
@@ -100,3 +101,4 @@ void	initialize_readline (config_t *config);
 char*	make_completion	    (char *string);
 char**	cmd_completion	    (const char *text, int start, int end);
 char*	cmd_generator	    (const char *text, int state);
+int     ag_setenv           (char* line);

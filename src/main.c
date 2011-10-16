@@ -78,11 +78,11 @@ int main (){
 
         switch (get_cmd_code (cmd.name)){
             case EMPTY_CMD:
-   	            break;
+                break;
 
             case CD_CMD:
                 change_directory (cmd.argv[1], ag_config.loglevel);
-   	            break;
+                break;
 
             case HELP_CMD:
                 if (cmd.argc > 2)
@@ -98,17 +98,21 @@ int main (){
 
             case SHORTHELP_CMD:
                 print_help(&ag_config, "-s");
-   	            break;
+                break;
+
+            case SETENV_CMD:
+                ag_setenv (cmd.argv[1]);
+                break;
 
             case ENV_CMD:
-   	            print_env (cmd.argv[1]);
-   	            break;
+                print_env (cmd.argv[1]);
+                break;
 
             case EXIT_CMD:
 		free (commandline);
 		commandline = (char *)NULL;
                 closelog ();
-   	            return 0;
+                return 0;
 
             case OTHER_CMD:
 
