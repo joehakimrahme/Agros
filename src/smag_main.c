@@ -5,9 +5,6 @@
 #include "iniparser.h"
 #include "smags.h"
 
-#define CONF_FILE "agros.conf"
-#define BASEGRP "General"
-
 
 
 char* get_inipkey (char* sec, char* key)

@@ -4,7 +4,6 @@
 
 #include "iniparser.h"
 
-#define CONF_FILE "agros.conf"
 #define BASEGRP "General"
 
 /*
