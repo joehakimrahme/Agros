@@ -27,14 +27,21 @@
 #include <unistd.h>
 #include <assert.h>
 #include <syslog.h>
-#include <glib.h>
 #include <pwd.h>
 #include <sys/types.h>
+#include <signal.h>
+
+#include "smags.h"
 #include "agros.h"
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
+/*
 #ifndef CONFIG_FILE
 #define CONFIG_FILE "agros.conf"
 #endif
+*/
 
 /*
  * A global array holding the associations between each built-in command
@@ -44,14 +51,25 @@
  */
 
 built_in_commands my_commands[CMD_NBR] = {
-    {"exit" , EXIT_CMD  },
-    {""     , EMPTY_CMD },
-    {"cd"   , CD_CMD    },
-    {"env"  , ENV_CMD   },
-    {"help" , HELP_CMD  },
-    {"?"    , HELP_CMD  }
+    {""         , EMPTY_CMD         , ""},
+    {"cd"       , CD_CMD            , "change directory"},
+    {"env"      , ENV_CMD           , "print enviroment."},
+    {"exit"     , EXIT_CMD          , "exit from AGROS"},
+    {"help"     , HELP_CMD          , "print help"},
+    {"setenv"   , SETENV_CMD        , "modify the environment"},
+    {"?"        , SHORTHELP_CMD     , "print short help"}
 };
 
+/*
+ * A reference to the list and number of allowed commands.
+ * This list is used when autocompleting commands.
+ */
+char **allowed_list = (char **)NULL;
+int allowed_nbr = 0;
+
+/* This variable contains the environment. I use it in my "env" built-in
+   function */
+extern char** environ;
 
 /*
  * This function parses a string and fills a command_t struct.
@@ -65,7 +83,7 @@ built_in_commands my_commands[CMD_NBR] = {
 
 void parse_command (char *cmdline, command_t *cmd){
     int count = 0;
-    char* word;
+    char* word = NULL;
 
     word = strtok (cmdline, WHITESPACE);
 
@@ -87,58 +105,36 @@ void parse_command (char *cmdline, command_t *cmd){
     strcpy (cmd->name, cmd->argv[0]);
 }
 
-
 /*
- * Reads the input using fgets
+ * Reads the input using GNU Readline.
+ * Saves each input in a history list.
+ * - prompt: The prompt to display when asking for input.
+ * The result is dynamically allocated and should 
+ * be cleaned up with free().
  */
 
-int read_input (char* string, int num){
-    char* CRPosition = NULL;
+char *read_input (char *prompt)
+{
+    char *result;
+    result  = readline(prompt);
 
-    if (fgets (string, num, stdin)){
-	    CRPosition = strchr (string, '\n');
+    /* Add the line to the history if it's valid and non-empty */
+    if (result  && *result)
+        add_history(result);
 
-	    if (CRPosition)
-	        *CRPosition = '\0';
-
-	    return AG_TRUE;
-
-    }else
-	    return AG_FALSE;
+    return result;
 }
 
 
 /*
- * Modifiy this function to modify the prompt. Ultimately, I want to define the prompt
- * inside the conf file à la bash.
- *
- * Some systems use USERNAME, others use USER. Hence the ugly if.
- *
+ * Prints the prompt to the given string.
+ * - prompt: The string that will contain the prompt
+ * - length: The maximum length of the prompt
+ * - username: The username to display
  */
-
-void print_prompt (char* username){
-//    char *var = "Testing(#l)";
-    char *var = "AGROS";
-    char *promptstring = NULL;
-    size_t length  = 0;
-    int i=0;
-
-    length = strlen ("[]:$ ") + strlen (username) + strlen (getenv ("PWD"));
-
-
-
-    if (strlen (var) + length > MAX_LINE_LEN -1)
-    {
-        printf ("Error: prompt too long");
-        _exit(EXIT_FAILURE);
-    }
-
-    promptstring = (char *)malloc (sizeof (char) * MAX_LINE_LEN);
-
-    sprintf (promptstring, "[%s]%s:%s$ ", var, username, getenv ("PWD"));
-    fprintf (stdout, "%s", promptstring);
-
-    free (promptstring);
+void get_prompt (char *prompt, int length, char *username)
+{
+    snprintf(prompt, length, "[%s]%s$ ", username, getenv("PWD"));
 }
 
 /*
@@ -146,21 +142,48 @@ void print_prompt (char* username){
  * TODO: Store my string messages (help + error messages) in a separate file.
  */
 
-void print_help(config_t* config){
+void print_help(config_t* config, char* helparg){
     int i =0;
 
-    fprintf (stdout, "\n");
-    fprintf (stdout, "\n");
-    for (i=0; i<70; i++)
-        fprintf (stdout, "*");
-    fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
-    fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\n");
-    print_allowed (config->allowed_list);
-    print_forbidden (config->forbidden_list);
-    for (i=0; i<70; i++)
-        fprintf (stdout, "*");
-    fprintf (stdout, "\n");
-    fprintf (stdout, "\n");
+    if (!strcmp (helparg, "-b")){
+
+        for (i=0; i<CMD_NBR; i++){
+
+            if (my_commands[i].command_code != OTHER_CMD
+                && my_commands[i].command_code != EMPTY_CMD)
+
+                fprintf (stdout, "%s\t:%s\n", my_commands[i].command_name,
+                                              my_commands[i].command_desc);
+        }
+
+    }else if (!strcmp (helparg, "-a")){
+
+        fprintf (stdout, "\n\n");
+
+        for (i=0; i<70; i++)
+            fprintf (stdout, "*");
+
+        fprintf (stdout, "\nWelcome to AGROS, the newer limited shell.\n");
+        /* Show list of builtins */
+        fprintf (stdout, "Note: At any time, you can type 'exit' to close the shell.\n\n");
+
+        print_allowed (config->allowed_list);
+        print_forbidden (config->forbidden_list);
+
+        for (i=0; i<80; i++)
+            fprintf (stdout, "*");
+
+        fprintf (stdout, "\n\n");
+
+    }else if (!strcmp (helparg, "-s")){
+
+        print_allowed (config->allowed_list);
+        print_forbidden (config->forbidden_list);
+
+    } else
+
+        fprintf (stdout, "Unkown option %s\n", helparg);
+
 }
 
 /*
@@ -191,17 +214,32 @@ void change_directory (char* path, int loglevel){
 
 /*
  * This function access the global array variable my_commands
- * and returns the command_code eauivalent to each command.
+ * and returns the command_code equivalent to each command.
  *
  */
 
 int get_cmd_code (char* cmd_name){
     int i = 0;
     for (i=0; i<CMD_NBR; i++){
-	    if (!strcmp (my_commands[i].command_name, cmd_name))
-	        return my_commands[i].command_code;
+        if (!strcmp (my_commands[i].command_name, cmd_name))
+            return my_commands[i].command_code;
     }
     return OTHER_CMD;
+}
+
+/*
+ * This function access the global array variable my_commands
+ * and returns the equivalent command_desc vaule.
+ *
+ */
+
+char* get_cmd_desc (char* cmd_name){
+    int i = 0;
+    for (i=0; i<CMD_NBR; i++){
+        if (!strcmp (my_commands[i].command_name, cmd_name))
+            return my_commands[i].command_desc;
+    }
+    return "";
 }
 
 /*
@@ -218,9 +256,9 @@ int check_validity (command_t cmd, config_t config){
 
     /* Checks if the command name is part of the allowed list */
     while (config.allowed_list[i]){
-	    if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
-	        valid = AG_FALSE;
-	    i++;
+        if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
+            valid = AG_FALSE;
+        i++;
     }
 
     /* Checks that the command line does not include any forbidden character */
@@ -248,14 +286,14 @@ void print_env (char* env_variable){
     char** var = NULL;
 
     if (env_variable != NULL){
-	    env_value = getenv(env_variable);
-	    if (env_value)
-	        fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
-	    else
-	        fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
+        env_value = getenv(env_variable);
+        if (env_value)
+            fprintf (stdout, "%s:\t%s\n", env_variable, getenv(env_variable));
+        else
+            fprintf (stdout, "Environment variable %s does not exist.\n", env_variable);
     }else {
-	    for (var = environ; *var != NULL; ++var)
-	        fprintf (stdout, "%s\n", *var);
+        for (var = environ; *var != NULL; ++var)
+            fprintf (stdout, "%s\n", *var);
     }
 }
 
@@ -292,101 +330,12 @@ void print_allowed (char** allowed){
     fprintf (stdout, "List of allowed actions:\n\n");
     if (strcmp (allowed[0],"*")){
         while (allowed[i]){
-	        fprintf (stdout, " * %s\n", allowed[i]);
-	        i++;
+            fprintf (stdout, " * %s\n", allowed[i]);
+            i++;
         }
         fprintf (stdout, "\n");
     } else
         fprintf (stdout, " * (all)\n\n");
-}
-
-/*
- * EFFECTS: parses CONFIG_FILE.
- * MODIFIES: allowed_list, allowed_nbr, welcome_message, loglevel
- */
-
-void parse_config (config_t* config, char* username){
-    GKeyFile* gkf;
-    gsize gallowed_nbr;
-    gsize gforbidden_nbr;
-    char* glib_group = NULL;
-
-    gkf = g_key_file_new ();
-
-    /* Loads the file into gkf */
-    if (!g_key_file_load_from_file (gkf, CONFIG_FILE, G_KEY_FILE_NONE, NULL)){
-	    fprintf (stderr, "Could not read config file %s\nTry using another shell or contact an administrator.\n", CONFIG_FILE);
-        syslog (LOG_ERR, "Could not read config file: %s.", CONFIG_FILE);
-        closelog ();
-	    exit (EXIT_FAILURE);
-    }
-
-    /* If the file exists and is loaded, we proceed to parsing it */
-
-    /* LOGLEVEL */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "loglevel", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "loglevel", NULL)){
-	    config->loglevel = g_key_file_get_integer (gkf, glib_group, "loglevel", NULL);
-        syslog (LOG_NOTICE, "Setting log level to: %d.", config->loglevel);
-    }
-    else
-	    config->loglevel = 0;
-
-    /* WELCOME MESSAGE */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "welcome", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "welcome", NULL)){
-	    config->welcome_message = g_key_file_get_string (gkf, glib_group, "welcome", NULL);
-        if (config->loglevel >=3) syslog (LOG_NOTICE, "Setting welcome message to: %s.", config->welcome_message);
-    } else
-	    config->welcome_message = NULL;
-
-    /* ALLOWED COMMANDS */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "allowed", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "allowed", NULL)){
-	    config->allowed_list = g_key_file_get_string_list (gkf, glib_group, "allowed", &gallowed_nbr, NULL);
-	    config->allowed_nbr = gallowed_nbr;
-    }else {
-        fprintf (stderr, "Cannot launch AGROS; missing allowed list from conf file.\n");
-        if (config->loglevel >=1) syslog (LOG_NOTICE, "Error in conf file, missing allowed list!");
-        exit (EXIT_SUCCESS);
-    }
-
-    /* FORBIDDEN CHARACTERS */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "forbidden", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "forbidden", NULL)){
-	    config->forbidden_list = g_key_file_get_string_list (gkf, glib_group, "forbidden", &gforbidden_nbr, NULL);
-	    config->forbidden_nbr = gforbidden_nbr;
-    }else {
-        fprintf (stderr, "Cannot launch AGROS; missing parameter from conf file.\n");
-        if (config->loglevel >=1) syslog (LOG_NOTICE, "Error in conf file, missing forbidden list!");
-        exit (EXIT_SUCCESS);
-    }
-
-    /* WARNING_NBR */
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, "warnings", NULL)){
-        glib_group =  username;
-    }else
-        glib_group = "General";
-    if (g_key_file_has_key (gkf, glib_group, "warnings", NULL)){
-	    config->warnings = g_key_file_get_integer (gkf, glib_group, "warnings", NULL);
-        syslog (LOG_NOTICE, "Setting initial warning number to: %d.", config->warnings);
-    }
-    else
-	    config->warnings = -1;
-
-     g_key_file_free (gkf);
 }
 
 /*
@@ -437,13 +386,122 @@ int runs_in_background (command_t* cmd){
     return AG_FALSE;
 }
 
-/***************************************************************************************************************************
+/*
+ * Readline functionality
+ */
 
-void set_glib_group (char** glib_group, GKeyFile* gkf, char* username, char* key){
-    if (g_key_file_has_group (gkf, username) && g_key_file_has_key(gkf, username, key, NULL)){
-        *glib_group =  username;
-    }else
-        *glib_group = "General";
+/*
+ * Set up autocompletion and history using GNU Readline
+ * - config: The AGROS configuration to use when autocompleting.
+ */
+void initialize_readline(config_t *config)
+{
+    /* Can be used for customization in the future */
+    rl_readline_name = "AGROS";
+
+    /* The function to call before default autocompletion kicks in */
+    rl_attempted_completion_function = cmd_completion;
+
+    /* Get a handle to the list of allowed commands and its length
+     * This allows us to autocomplete these as well.
+     */
+    allowed_list = config->allowed_list;
+    allowed_nbr = config->allowed_nbr;
 }
 
-***************************************************************************************************************************/
+/*
+ * This function is automatically called by GNU Readline
+ * when autocompleting.
+ * - text: The text the user has entered.
+ * - start: An index to the start of the text in the input buffer.
+ * - end: An index to the end of the text in the input buffer.
+ */
+char **cmd_completion(const char *text, int start, int end)
+{
+    char **matches = (char **)NULL;
+    
+    /* Making sure end is used, not really useful for anything */
+    if (end == 0) {
+    ;
+    }
+
+    /* 
+     * We're at the beginning of the buffer, so we should match
+     * built-in functions and commands. Otherwise, readline will
+     * automatically match file names
+     */
+    if (start == 0)
+    matches = rl_completion_matches(text, cmd_generator);
+
+    return matches;
+}
+
+/*
+ * Dynamically allocates a string and returns a pointer to it.
+ * - string: The string to copy into the new location
+ */
+char *make_completion(char *string)
+{
+    char *result = (char *)NULL;
+    int length= strlen(string) + 1;
+    result = malloc(length);
+    if (result)
+        strncpy(result, string, length);
+
+    return result;
+}
+
+/*
+ * Searches built-in functions and allowed commands 
+ * for matches to currently entered text.
+ * - text: The text to match.
+ * - state: Indicates the status of the search.
+ *   When state is 0, this function is being called 
+ *   in a new autocompletion, and it should start a 
+ *   new search.
+ */
+char *cmd_generator(const char *text, int state)
+{
+    static int cmd_index;
+    static int allowed_index;
+    static int length;
+
+    char *value = (char *)NULL;
+
+    /* Prepare a new search for matches */
+    if (state == 0) {
+        cmd_index = 0;
+        allowed_index = 0;
+        length = strlen(text);
+    }
+
+    /* Check the list of built-in functions for a match */
+    while (cmd_index < CMD_NBR) {
+        value = my_commands[cmd_index].command_name;
+        cmd_index++;
+        if (strncmp(value, text, length) == 0)
+            return make_completion(value);
+    }
+
+    /* Check the list of allowed commands for a match */
+    while (allowed_index < allowed_nbr) {
+        value = allowed_list[allowed_index];
+        allowed_index++;
+        if (strncmp(value, text, length) == 0)
+            return make_completion(value);
+    }
+
+    /* No matches were found. */
+    return (char *)NULL;
+}
+
+int ag_setenv (char *line){
+
+    char *_value = strdup(line);
+    char *_variable = strsep(&_value, "=");
+
+    if (_value)
+        setenv (_variable, _value, 1);
+
+    return EXIT_SUCCESS;
+}

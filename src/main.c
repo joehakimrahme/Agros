@@ -27,15 +27,18 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <sys/wait.h>
+
+#include "smags.h"
 #include "agros.h"
 
 int main (){
     int pid = 0;
     command_t cmd = {NULL, 0, {NULL}};
-    char commandline[MAX_LINE_LEN];
+    char *commandline = (char *)NULL;
     char* username = NULL;
-    config_t ag_config;
+    config_t ag_config = {NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0};
     int bg_cmd = AG_FALSE;
+    char prompt[MAX_LINE_LEN];
 
     /* Sets the username */
     set_username (&username);
@@ -45,6 +48,9 @@ int main (){
 
     /* Parses the config files for data */
     parse_config (&ag_config, username);
+
+    /* Initializes GNU Readline */
+    initialize_readline(&ag_config);
 
     /*
      *   Main loop:
@@ -59,30 +65,54 @@ int main (){
     }
 
     while (AG_TRUE){
+	/* Set the prompt */
+	get_prompt(prompt, MAX_LINE_LEN, username);
 
-        print_prompt(username);
-        read_input (commandline, MAX_LINE_LEN);
+	/* 
+	 * Read a line of input 
+	 * commandline should be deallocated with free() 
+	 */
+	commandline = read_input (prompt);
+
         parse_command (commandline, &cmd);
 
         switch (get_cmd_code (cmd.name)){
             case EMPTY_CMD:
-   	            break;
+                break;
 
             case CD_CMD:
                 change_directory (cmd.argv[1], ag_config.loglevel);
-   	            break;
+                break;
 
             case HELP_CMD:
-                print_help(&ag_config);
-   	            break;
+                if (cmd.argc > 2)
+                    fprintf (stdout, "Too many arguments\n");
+
+                else if (cmd.argc == 1)
+                    print_help (&ag_config, "-a");
+
+                else
+                    print_help(&ag_config, cmd.argv[1]);
+
+                break;
+
+            case SHORTHELP_CMD:
+                print_help(&ag_config, "-s");
+                break;
+
+            case SETENV_CMD:
+                ag_setenv (cmd.argv[1]);
+                break;
 
             case ENV_CMD:
-   	            print_env (cmd.argv[1]);
-   	            break;
+                print_env (cmd.argv[1]);
+                break;
 
             case EXIT_CMD:
+		free (commandline);
+		commandline = (char *)NULL;
                 closelog ();
-   	            return 0;
+                return 0;
 
             case OTHER_CMD:
 
@@ -91,29 +121,45 @@ int main (){
                 pid = vfork();
 
    	            if (pid == 0){
-                if (!check_validity (cmd, ag_config)){
-                    if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
-                    execvp (cmd.argv[0], cmd.argv);
-   	        	    fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
-                    if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
-                }else {
-   	        	    fprintf (stdout, "Not allowed! \n");
-                    if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
-                    if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
-                }
+                    if (!check_validity (cmd, ag_config)){
 
-                _exit(EXIT_FAILURE);
+                        if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
+                        execvp (cmd.argv[0], cmd.argv);
+
+                        fprintf (stderr, "%s: Could not execute command!\nType '?' for help.\n", cmd.name);
+                        if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
+
+                    }else {
+
+                        fprintf (stdout, "Not allowed! \n");
+
+                        if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
+                        if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
+                    }
+
+                    _exit(EXIT_FAILURE);
+
    	            }else if (pid < 0){
+
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
                     if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
+
    	            }else {
+
                     if (!bg_cmd)
                         wait (0);
+
    	            }
    	            break;
         }
+
+	free (commandline);
+	commandline = (char *)NULL;
     }
 
+    if (commandline)
+	free (commandline);
     closelog();
+
     return 0;
 }
