@@ -50,7 +50,7 @@
  *
  */
 
-built_in_commands my_commands[CMD_NBR] = {
+built_in_commands my_commands[] = {
     {""         , EMPTY_CMD         , ""},
     {"cd"       , CD_CMD            , "change directory"},
     {"env"      , ENV_CMD           , "print enviroment."},
@@ -59,6 +59,8 @@ built_in_commands my_commands[CMD_NBR] = {
     {"setenv"   , SETENV_CMD        , "modify the environment"},
     {"?"        , SHORTHELP_CMD     , "print short help"}
 };
+
+int const CMD_NBR = (sizeof(my_commands)/sizeof(my_commands[0])) + 1;
 
 /*
  * A reference to the list and number of allowed commands.
@@ -134,7 +136,7 @@ char *read_input (char *prompt)
  */
 void get_prompt (char *prompt, int length, char *username)
 {
-    snprintf(prompt, length, "[%s]%s$ ", username, getenv("PWD"));
+    snprintf(prompt, length, "[%d]%s:%s$ ", CMD_NBR, username, getenv("PWD"));
 }
 
 /*

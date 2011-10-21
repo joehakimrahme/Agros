@@ -101,7 +101,8 @@ int main (){
                 break;
 
             case SETENV_CMD:
-                ag_setenv (cmd.argv[1]);
+                if (cmd.argv[1])
+                    ag_setenv (cmd.argv[1]);
                 break;
 
             case ENV_CMD:

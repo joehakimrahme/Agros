@@ -36,7 +36,6 @@
 
 #define OTHER_CMD           7
 
-#define CMD_NBR             8
 
 #define AG_FALSE 0
 #define AG_TRUE  1
