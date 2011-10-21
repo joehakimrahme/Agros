@@ -37,7 +37,6 @@ int main (){
     char *commandline = (char *)NULL;
     char* username = NULL;
     config_t ag_config = {NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0};
-    int bg_cmd = AG_FALSE;
     char prompt[MAX_LINE_LEN];
 
     /* Sets the username */
@@ -65,14 +64,14 @@ int main (){
     }
 
     while (AG_TRUE){
-	/* Set the prompt */
-	get_prompt(prompt, MAX_LINE_LEN, username);
+        /* Set the prompt */
+        get_prompt(prompt, MAX_LINE_LEN, username);
 
-	/* 
-	 * Read a line of input 
-	 * commandline should be deallocated with free() 
-	 */
-	commandline = read_input (prompt);
+        /*
+         * Read a line of input
+         * commandline should be deallocated with free()
+         */
+        commandline = read_input (prompt);
 
         parse_command (commandline, &cmd);
 
@@ -110,18 +109,17 @@ int main (){
                 break;
 
             case EXIT_CMD:
-		free (commandline);
-		commandline = (char *)NULL;
+                free (commandline);
+                commandline = (char *)NULL;
                 closelog ();
                 return 0;
 
             case OTHER_CMD:
 
                 /* Determines whether the command should run in the bg or not */
-                bg_cmd = runs_in_background (&cmd);
                 pid = vfork();
 
-   	            if (pid == 0){
+                if (pid == 0){
                     if (!check_validity (cmd, ag_config)){
 
                         if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
@@ -131,35 +129,31 @@ int main (){
                         if (ag_config.loglevel >= 2)    syslog (LOG_NOTICE, "Could not execute: %s.", cmd.name);
 
                     }else {
-
                         fprintf (stdout, "Not allowed! \n");
-
                         if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
                         if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
                     }
-
                     _exit(EXIT_FAILURE);
 
-   	            }else if (pid < 0){
+                }else if (pid < 0){
 
                     fprintf (stderr, "Error! ... Negative PID. God knows what that means ...\n");
                     if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
 
-   	            }else {
-
-                    if (!bg_cmd)
-                        wait (0);
-
-   	            }
-   	            break;
+                }else {
+                    /* Wait until the end of child process, then resumes the loop */
+                    wait (0);
+                    break;
+                }
         }
 
-	free (commandline);
-	commandline = (char *)NULL;
+        free (commandline);
+        commandline = (char *)NULL;
     }
 
     if (commandline)
-	free (commandline);
+        free (commandline);
+
     closelog();
 
     return 0;

@@ -111,7 +111,7 @@ void parse_command (char *cmdline, command_t *cmd){
  * Reads the input using GNU Readline.
  * Saves each input in a history list.
  * - prompt: The prompt to display when asking for input.
- * The result is dynamically allocated and should 
+ * The result is dynamically allocated and should
  * be cleaned up with free().
  */
 
@@ -136,7 +136,7 @@ char *read_input (char *prompt)
  */
 void get_prompt (char *prompt, int length, char *username)
 {
-    snprintf(prompt, length, "[%d]%s:%s$ ", CMD_NBR, username, getenv("PWD"));
+    snprintf(prompt, length, "[%s]%s$ ", username, getenv("PWD"));
 }
 
 /*
@@ -278,9 +278,9 @@ int check_validity (command_t cmd, config_t config){
     return valid;
 }
 
-/* 
- * Built-in function that displays the environment. As simple as that. 
- * 
+/*
+ * Built-in function that displays the environment. As simple as that.
+ *
  */
 
 void print_env (char* env_variable){
@@ -370,25 +370,6 @@ void decrease_warnings (config_t* ag_config){
 }
 
 /*
- * This function looks for the '&' character.
- *
- */
-int runs_in_background (command_t* cmd){
-    int i=0;
-    char* position=NULL;
-
-    for (i=0; i<cmd->argc; i++){
-        position = strchr (cmd->argv[i], '&');
-        if (position){
-            *position = '\0';
-            return AG_TRUE;
-        }
-    }
-
-    return AG_FALSE;
-}
-
-/*
  * Readline functionality
  */
 
@@ -421,13 +402,13 @@ void initialize_readline(config_t *config)
 char **cmd_completion(const char *text, int start, int end)
 {
     char **matches = (char **)NULL;
-    
+
     /* Making sure end is used, not really useful for anything */
     if (end == 0) {
     ;
     }
 
-    /* 
+    /*
      * We're at the beginning of the buffer, so we should match
      * built-in functions and commands. Otherwise, readline will
      * automatically match file names
@@ -454,12 +435,12 @@ char *make_completion(char *string)
 }
 
 /*
- * Searches built-in functions and allowed commands 
+ * Searches built-in functions and allowed commands
  * for matches to currently entered text.
  * - text: The text to match.
  * - state: Indicates the status of the search.
- *   When state is 0, this function is being called 
- *   in a new autocompletion, and it should start a 
+ *   When state is 0, this function is being called
+ *   in a new autocompletion, and it should start a
  *   new search.
  */
 char *cmd_generator(const char *text, int state)

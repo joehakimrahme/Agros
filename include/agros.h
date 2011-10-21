@@ -95,7 +95,6 @@ void    print_forbidden     (char** forbidden);
 void    set_username        (char** username);
 void    set_homedir         (char** homedir);
 void    decrease_warnings   (config_t* ag_config);
-int     runs_in_background  (command_t* cmd);
 void	initialize_readline (config_t *config);
 char*	make_completion	    (char *string);
 char**	cmd_completion	    (const char *text, int start, int end);
