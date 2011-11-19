@@ -377,7 +377,7 @@ void decrease_warnings (config_t* ag_config){
  * Set up autocompletion and history using GNU Readline
  * - config: The AGROS configuration to use when autocompleting.
  */
-void initialize_readline(config_t *config)
+inline void initialize_readline(config_t *config)
 {
     /* Can be used for customization in the future */
     rl_readline_name = "AGROS";
@@ -423,7 +423,7 @@ char **cmd_completion(const char *text, int start, int end)
  * Dynamically allocates a string and returns a pointer to it.
  * - string: The string to copy into the new location
  */
-char *make_completion(char *string)
+inline char *make_completion(char *string)
 {
     char *result = (char *)NULL;
     int length= strlen(string) + 1;
@@ -478,7 +478,7 @@ char *cmd_generator(const char *text, int state)
     return (char *)NULL;
 }
 
-int ag_setenv (char *line){
+inline int ag_setenv (char *line){
 
     char *_value = strdup(line);
     char *_variable = strsep(&_value, "=");
