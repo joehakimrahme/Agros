@@ -56,7 +56,8 @@ built_in_commands my_commands[] = {
     {"env"      , ENV_CMD           , "print enviroment."},
     {"exit"     , EXIT_CMD          , "exit from AGROS"},
     {"help"     , HELP_CMD          , "print help"},
-    {"setenv"   , SETENV_CMD        , "modify the environment"},
+    {"set"      , SETENV_CMD        , "modify the environment"},
+    {"unset"    , UNSETENV_CMD      , "unset environment variable"},
     {"?"        , SHORTHELP_CMD     , "print short help"}
 };
 
@@ -478,13 +479,37 @@ char *cmd_generator(const char *text, int state)
     return (char *)NULL;
 }
 
-inline int ag_setenv (char *line){
+/*
+ * line arg should be 'foo=bar'
+ */
+inline int ag_setenv (char *line)
+{
+    char *_envline = (char *)malloc (sizeof (line));
 
-    char *_value = strdup(line);
-    char *_variable = strsep(&_value, "=");
+    if (strchr (line, '=')){
+        strcpy (_envline, line);
 
-    if (_value)
-        setenv (_variable, _value, 1);
+        printf ("%s", _envline);
+        putenv (_envline);
+        return EXIT_SUCCESS;
+    }
+    else{
 
+        free (_envline);
+        return EXIT_FAILURE;
+    }
+}
+
+inline int ag_unsetenv (char *line)
+{
+    char*_envline = (char *)malloc (sizeof (line) + 1);
+
+    if (strlen (line) < MAX_LINE_LEN){
+
+        sprintf (_envline, "%s=", line);
+        putenv (_envline);
+    }
+
+    free (_envline);
     return EXIT_SUCCESS;
 }

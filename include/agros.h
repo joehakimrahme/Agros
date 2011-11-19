@@ -37,6 +37,7 @@
 #define HELP_CMD            4
 #define SHORTHELP_CMD       5
 #define SETENV_CMD          6
+#define UNSETENV_CMD        7
 
 
 
@@ -102,5 +103,6 @@ char*	make_completion	    (char *string);
 char**	cmd_completion	    (const char *text, int start, int end);
 char*	cmd_generator	    (const char *text, int state);
 int     ag_setenv           (char* line);
+int     ag_unsetenv         (char* line);
 void    set_username        (char** username);
 void    set_homedir         (char** homedir);
