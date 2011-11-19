@@ -502,10 +502,11 @@ inline int ag_setenv (char *line)
 
 inline int ag_unsetenv (char *line)
 {
-    char*_envline = (char *)malloc (sizeof (line) + 1);
+    char*_envline = NULL;
 
     if (strlen (line) < MAX_LINE_LEN){
 
+        _envline = (char *)malloc (sizeof (line) + 1);
         sprintf (_envline, "%s=", line);
         putenv (_envline);
     }

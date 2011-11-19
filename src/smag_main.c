@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #include "iniparser.h"
 #include "smags.h"
@@ -53,11 +54,15 @@ void parse_config (config_t* config, char* username){
     
 
     config->loglevel = iniparser_getint (conf_dict, ag_get_agkey (conf_dict, username, "loglevel", BASEGRP), 0);
-
     config->welcome_message = iniparser_getstring (conf_dict, ag_get_agkey (conf_dict, username, "welcome", BASEGRP), "");
 
 
     config->_allowed_string = iniparser_getstring (conf_dict, ag_get_agkey (conf_dict, username, "allowed", BASEGRP), "");
+    if (strlen(config->_allowed_string) == 0){
+        fprintf (stderr, "Missing allowed config\n");
+        if (config->loglevel >= 1) syslog (LOG_ERR, "Missing allowed config\n");
+        _exit(EXIT_FAILURE);
+    }
     config->allowed_list = (char **)malloc (sizeof (char *) * 256);
 
     _aword = strtok (config->_allowed_string, ",");
@@ -88,6 +93,9 @@ void parse_config (config_t* config, char* username){
     }
 
     config->warnings = iniparser_getint (conf_dict, ag_get_agkey (conf_dict, username, "warnings", BASEGRP), -1);
-
-
+    if (config->warnings == -1){
+        fprintf (stderr, "Missing warnings config\n");
+        if (config->loglevel >= 1) syslog (LOG_ERR, "Missing warnings config\n");
+        _exit(EXIT_FAILURE);
+    }
 }
