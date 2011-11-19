@@ -125,8 +125,8 @@ int main (){
                 pid = vfork();
 
                 if (pid == 0){
-                    if (!check_validity (cmd, ag_config)){
 
+                    if (!check_validity (cmd, ag_config)){
                         if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
                         execvp (cmd.argv[0], cmd.argv);
 
@@ -146,6 +146,7 @@ int main (){
                     if (ag_config.loglevel >= 1) syslog (LOG_ERR, "Negative PID. Using command: %s.", cmd.name);
 
                 }else {
+
                     /* Wait until the end of child process, then resumes the loop */
                     wait (0);
                     break;

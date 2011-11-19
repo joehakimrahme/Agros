@@ -359,7 +359,7 @@ void set_homedir (char** phomedir){
 }
 
 void decrease_warnings (config_t* ag_config){
-    if (ag_config->warnings > 0){
+    if (ag_config->warnings > 1){
         ag_config->warnings--;
         if (ag_config->warnings >= 0)  fprintf (stdout, "Warnings remaining: %d\n", ag_config->warnings);
     }else {
