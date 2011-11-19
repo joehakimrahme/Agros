@@ -4,7 +4,7 @@
 
 #include "iniparser.h"
 
-#define BASEGRP "General"
+#define BASEGRP "default"
 
 /*
  * A structure that holds the AGROS conf.

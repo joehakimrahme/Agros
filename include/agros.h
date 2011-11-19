@@ -25,6 +25,10 @@
 #define MAX_ARGS (MAX_LINE_LEN/2)
 #define WHITESPACE " \t\n"
 
+
+
+
+#define OTHER_CMD          -1
 #define EMPTY_CMD           0
 
 #define CD_CMD              1
@@ -34,11 +38,12 @@
 #define SHORTHELP_CMD       5
 #define SETENV_CMD          6
 
-#define OTHER_CMD           7
+
 
 
 #define AG_FALSE 0
 #define AG_TRUE  1
+
 
 
 /*
@@ -60,7 +65,8 @@ struct built_in_commands{
  * This structure holds user input. 3 fields:
  *   - argv: an array of strings. Each word of the input is a case of the array.
  *   - name: the name of the executable called. By default it's argv[0]
- *   - argc: the number of words given in input. It's equivalent to the length of argv.
+ *   - argc: the number of words given in input. It's equivalent to the length
+ *           of argv.
  *
  * Note: Some filenames have a space character (" ") in their names. I will have
  * to deal with that properly ... someday.
@@ -74,29 +80,27 @@ struct command_t{
 };
 
 
-/*
- * These are the functions called by AGROS. These declarations are pretty explicit.
- * More detailed comments can be found in source files.
- *
- */
 
-void    parse_command       (char *cmdline, command_t *cmd);
-void	get_prompt          (char *prompt, int length, char *username);
-char*	read_input          (char *prompt);
-void    print_prompt        (char* username);
-void    print_help          (config_t* config, char* helparg);
-void    change_directory    (char* path, int loglevel);
+
+/* AGROS functions */
 int     get_cmd_code        (char* cmd_name);
 char*   get_cmd_desc        (char* cmd_name);
+void    decrease_warnings   (config_t* ag_config);
 int     check_validity      (command_t cmd, config_t config);
 void    print_env           (char* env_variable);
 void    print_allowed       (char** allowed);
 void    print_forbidden     (char** forbidden);
-void    set_username        (char** username);
-void    set_homedir         (char** homedir);
-void    decrease_warnings   (config_t* ag_config);
+void    print_help          (config_t* config, char* helparg);
+
+/* Unix shell functions */
+void	get_prompt          (char *prompt, int length, char *username);
+char*	read_input          (char *prompt);
+void    parse_command       (char *cmdline, command_t *cmd);
+void    change_directory    (char* path, int loglevel);
 void	initialize_readline (config_t *config);
 char*	make_completion	    (char *string);
 char**	cmd_completion	    (const char *text, int start, int end);
 char*	cmd_generator	    (const char *text, int state);
 int     ag_setenv           (char* line);
+void    set_username        (char** username);
+void    set_homedir         (char** homedir);
