@@ -348,9 +348,12 @@ void print_allowed (char** allowed){
  */
 void decrease_warnings (config_t* ag_config){
     if (ag_config->warnings > 1){
+
         ag_config->warnings--;
-        if (ag_config->warnings >= 0)  fprintf (stdout, "Warnings remaining: %d\n", ag_config->warnings);
-    }else {
+        fprintf (stdout, "Warnings remaining: %d\n", ag_config->warnings);
+
+    }else if (ag_config->warnings == 1){
+
         fprintf (stderr, "Exiting AGROS. The incident will be reported. \n");
         if (ag_config->loglevel >= 1)    syslog (LOG_NOTICE, "User reached Max warnings. \n");
         kill (getppid(), SIGTERM);

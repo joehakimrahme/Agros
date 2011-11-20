@@ -93,6 +93,12 @@ void parse_config (config_t* config, char* username){
     }
 
     config->warnings = iniparser_getint (conf_dict, ag_get_agkey (conf_dict, username, "warnings", BASEGRP), -1);
+    if (config->warnings < -1){
+        fprintf(stderr, "Error: Bad 'warnings' config input.\n");
+        if (config->loglevel >= 1) syslog (LOG_ERR, "Error: Bad 'warnings' config input.\n");
+        _exit(EXIT_FAILURE);
+    }
+
     if (config->warnings == -1){
         fprintf (stderr, "Missing warnings config\n");
         if (config->loglevel >= 1) syslog (LOG_ERR, "Missing warnings config\n");
