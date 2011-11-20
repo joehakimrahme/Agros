@@ -33,20 +33,21 @@
 
 int main (){
     int pid = 0;
-    command_t cmd = {NULL, 0, {NULL}};
-    char *commandline = (char *)NULL;
-    char* username = NULL;
-    config_t ag_config = {NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0};
     char prompt[MAX_LINE_LEN];
+    char *commandline = (char *)NULL;
 
-    /* Sets the username */
-    set_username (&username);
+    command_t cmd = {NULL, 0, {NULL}};
+    config_t ag_config = {NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0};
+    user_t ag_user = {NULL, NULL};
+
+    /* Init ag_user */
+    init_user (&ag_user);
 
     /* Opens the syslog file */
-    openlog (username, LOG_PID, LOG_USER);
+    openlog (ag_user.username, LOG_PID, LOG_USER);
 
     /* Parses the config files for data */
-    parse_config (&ag_config, username);
+    parse_config (&ag_config, ag_user.username);
 
     /* Initializes GNU Readline */
     initialize_readline(&ag_config);
@@ -65,7 +66,7 @@ int main (){
 
     while (AG_TRUE){
         /* Set the prompt */
-        get_prompt(prompt, MAX_LINE_LEN, username);
+        get_prompt(prompt, MAX_LINE_LEN, &ag_user);
 
         /*
          * Read a line of input
@@ -80,7 +81,7 @@ int main (){
                 break;
 
             case CD_CMD:
-                change_directory (cmd.argv[1], ag_config.loglevel);
+                change_directory (cmd.argv[1], ag_config.loglevel, ag_user);
                 break;
 
             case HELP_CMD:

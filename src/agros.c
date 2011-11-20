@@ -135,9 +135,11 @@ char *read_input (char *prompt)
  * - length: The maximum length of the prompt
  * - username: The username to display
  */
-void get_prompt (char *prompt, int length, char *username)
+void get_prompt (char *prompt, int length, user_t *user)
 {
-    snprintf(prompt, length, "[%s]%s$ ", username, getenv("PWD"));
+    char *cwd = (char *)malloc (sizeof (MAX_LINE_LEN));
+
+    snprintf(prompt, length, "[%s]%s$ ", user->username, getcwd (cwd, MAX_LINE_LEN));
 }
 
 /*
@@ -198,11 +200,11 @@ void print_help(config_t* config, char* helparg){
  *
  */
 
-void change_directory (char* path, int loglevel){
+void change_directory (char* path, int loglevel, user_t user){
 
     /* If no arguments are given, go to $HOME directory */
     if (path == NULL)
-        set_homedir (&path);
+        path = user.homedir;
 
     if (chdir (path) == 0){
         if (loglevel >= 3) syslog (LOG_NOTICE, "Changing to directory: %s.", path);
@@ -342,22 +344,8 @@ void print_allowed (char** allowed){
 }
 
 /*
- * Setting variables using getuid() and getpwuid()
- * More info on these functions can easily be found in man pages.
- *
+ * This function is called when a forbidden command is entered.
  */
-void set_username (char** pusername){
-    struct passwd *pwd = NULL;
-    pwd = getpwuid (getuid());
-    *pusername = pwd->pw_name;
-}
-
-void set_homedir (char** phomedir){
-    struct passwd *pwd = NULL;
-    pwd = getpwuid (getuid());
-    *phomedir = pwd->pw_dir;
-}
-
 void decrease_warnings (config_t* ag_config){
     if (ag_config->warnings > 1){
         ag_config->warnings--;
@@ -514,3 +502,15 @@ inline int ag_unsetenv (char *line)
     free (_envline);
     return EXIT_SUCCESS;
 }
+
+inline void init_user (user_t *user)
+{
+    struct passwd *pwd = getpwuid (getuid());
+
+    user->username = (char *)malloc (sizeof (strlen (pwd->pw_name)));
+    user->homedir = (char *)malloc (sizeof (strlen (pwd->pw_dir)));
+
+    user->username = pwd->pw_name;
+    user->homedir = pwd->pw_dir;
+}
+

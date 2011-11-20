@@ -19,8 +19,6 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 #define MAX_LINE_LEN 256
 #define MAX_ARGS (MAX_LINE_LEN/2)
 #define WHITESPACE " \t\n"
@@ -80,6 +78,11 @@ struct command_t{
     char* argv[MAX_ARGS+1];
 };
 
+typedef struct user_t user_t;
+struct user_t{
+    char *username;
+    char *homedir;
+};
 
 
 
@@ -94,15 +97,14 @@ void    print_forbidden     (char** forbidden);
 void    print_help          (config_t* config, char* helparg);
 
 /* Unix shell functions */
-void	get_prompt          (char *prompt, int length, char *username);
+void	get_prompt          (char *prompt, int length, user_t *user);
 char*	read_input          (char *prompt);
 void    parse_command       (char *cmdline, command_t *cmd);
-void    change_directory    (char* path, int loglevel);
+void    change_directory    (char* path, int loglevel, user_t user);
 void	initialize_readline (config_t *config);
 char*	make_completion	    (char *string);
 char**	cmd_completion	    (const char *text, int start, int end);
 char*	cmd_generator	    (const char *text, int state);
 int     ag_setenv           (char* line);
 int     ag_unsetenv         (char* line);
-void    set_username        (char** username);
-void    set_homedir         (char** homedir);
+void    init_user           (user_t *user);
