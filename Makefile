@@ -1,7 +1,7 @@
 # VARIABLE DECLARATION
 ######################
 
-OBJS=  iniparser.o smag_main.o main.o agros.o
+OBJS= dictionary.o iniparser.o smag_main.o main.o agros.o
 CC=gcc
 CFLAGS=-Wall -Wextra -Werror
 
@@ -20,7 +20,7 @@ endif
 	
 # Default Rule. It all starts here
 agros: $(OBJS)
-	$(CC) $(CFLAGS) -lreadline -o agros $(OBJS) dictionary.o
+	$(CC) $(CFLAGS) -lreadline -o agros $(OBJS)
 	rm -f $(OBJS)
 	
 # Moves the executable to TARGETDIR if defined
@@ -39,16 +39,18 @@ main.o: agros.o smag_main.o src/main.c include/agros.h include/smags.h
 agros.o: smag_main.o src/agros.c include/agros.h include/smags.h
 	$(CC) $(CFLAGS) -c -I include/ -l readline src/agros.c
 
-smag_main.o: src/smag_main.c include/smags.h
+smag_main.o: src/smag_main.c include/smags.h include/iniparser.h
 ifdef SYSCONF
 	$(CC) $(CFLAGS) -c -I include/ src/smag_main.c -DCONF_FILE=$(SYSCONF)
 else
 	$(CC) $(CFLAGS) -c -I include/ src/smag_main.c
 endif
 
-iniparser.o: src/dictionary.c src/iniparser.c include/dictionary.h include/iniparser.h
-	$(CC) $(CFLAGS) -c -I include/ src/dictionary.c -o dictionary.o
+iniparser.o: src/iniparser.c include/iniparser.h include/dictionary.h
 	$(CC) $(CFLAGS) -c -I include/ src/iniparser.c
+
+dictionary.o: src/dictionary.c include/dictionary.h
+	$(CC) $(CFLAGS) -c -I include/ src/dictionary.c
 
 # PHONY RULES
 #############
