@@ -127,7 +127,7 @@ int main (){
 
                 if (pid == 0){
 
-                    if (!check_validity (cmd, ag_config)){
+                    if (check_validity (cmd, ag_config) == AG_TRUE){
                         if (ag_config.loglevel == 3)    syslog (LOG_NOTICE, "Using command: %s.", cmd.name);
                         execvp (cmd.argv[0], cmd.argv);
 

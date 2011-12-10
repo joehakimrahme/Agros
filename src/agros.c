@@ -256,13 +256,13 @@ char* get_cmd_desc (char* cmd_name){
  */
 
 int check_validity (command_t cmd, config_t config){
-    int valid = 1;
+    int valid = AG_FALSE;
     int i = 0, j = 0;
 
     /* Checks if the command name is part of the allowed list */
     while (config.allowed_list[i]){
         if (!strcmp (config.allowed_list[i], cmd.name) || !strcmp (config.allowed_list[i], "*"))
-            valid = AG_FALSE;
+            valid = AG_TRUE;
         i++;
     }
 
@@ -271,8 +271,9 @@ int check_validity (command_t cmd, config_t config){
 
     while (config.forbidden_list[i]){
         for (j=0; j<cmd.argc; j++){
-            if (strstr (cmd.argv[j], config.forbidden_list[i]) != NULL)
-                valid = AG_TRUE;
+            if (strstr (cmd.argv[j], config.forbidden_list[i]) != NULL &&
+                                    *(config.forbidden_list[i]) != 0)
+                valid = AG_FALSE;
         }
 
         i++;
