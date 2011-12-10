@@ -61,7 +61,7 @@ built_in_commands my_commands[] = {
     {"?"        , SHORTHELP_CMD     , "print short help"}
 };
 
-int const CMD_NBR = (sizeof(my_commands)/sizeof(my_commands[0])) + 1;
+int const CMD_NBR = (sizeof(my_commands)/sizeof(my_commands[0]));
 
 /*
  * A reference to the list and number of allowed commands.
