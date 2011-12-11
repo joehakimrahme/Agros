@@ -26,30 +26,14 @@
 
 
 Latest Release:
----------------
+###############
 
-    * Release Name: agros-0.3.2
-    * Release Date: 01/10/2011
+    * Release Name: agros-0.4.0
+    * Release Date: 11/12/2011
 
-
-Dependencies:
-------------
-
-    Only one so far. I want to keep them as little as possible.
-
-    * libreadline6-dev
 
 Install:
---------
-
-    First thing you need to do is to compile iniparser. From your top directory do the
-    following:
-
-    $ cd lib/iniparser
-    $ make
-    $ ln libiniparser.so.0 libiniparser
-
-
+########
     You can then compile the program by running "make". If the dependencies are present,
     it will create a binary executable named "agros" that can be directly runnable.
 
@@ -65,7 +49,7 @@ Install:
 
 
 Configuration:
---------------
+##############
 
     There are five variables defined in the agros.conf file.
 
@@ -86,10 +70,26 @@ Configuration:
                 enters a forbidden command. When warnings reach 0, AGROS exits.
 
 
+GNU Readline:
+#############
+
+    Agros has an experimental version implementing the GNU Readline library for handling
+    user input. It comes with nice features like autocompletion or command history.
+
+    So far the implementation is still buggy and not very stable. Which is why development
+    is maintained on a separate git branch. Use with caution as there is a high probablity
+    of random crashes.
+
+
 Contact
--------
+#######
 
     If you want to contribute to this project, please do not hesitate to send me comments
     or code patchs at my email adress:
 
     Joe "rahmu" HAKIM RAHME <joe.hakim.rahme@gmail.com>
+
+    You can also fork the repository on github.com, and send me pull requests. Here's the
+    repo's URL:
+
+    https://github.com/rahmu/Agros
