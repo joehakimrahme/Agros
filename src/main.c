@@ -33,8 +33,8 @@
 
 int main (){
     int pid = 0;
+    char *commandline = NULL;
     char prompt[MAX_LINE_LEN];
-    char *commandline = (char *)NULL;
 
     command_t cmd = {NULL, 0, {NULL}};
     config_t ag_config = {NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0};
@@ -49,8 +49,6 @@ int main (){
     /* Parses the config files for data */
     parse_config (&ag_config, ag_user.username);
 
-    /* Initializes GNU Readline */
-    initialize_readline(&ag_config);
 
     /*
      *   Main loop:
@@ -67,13 +65,9 @@ int main (){
     while (AG_TRUE){
         /* Set the prompt */
         get_prompt(prompt, MAX_LINE_LEN, &ag_user);
+        fprintf (stdout, "%s", prompt);
 
-        /*
-         * Read a line of input
-         * commandline should be deallocated with free()
-         */
-        commandline = read_input (prompt);
-
+        commandline = read_input (MAX_LINE_LEN);
         parse_command (commandline, &cmd);
 
         switch (get_cmd_code (cmd.name)){
@@ -115,8 +109,6 @@ int main (){
                 break;
 
             case EXIT_CMD:
-                free (commandline);
-                commandline = (char *)NULL;
                 closelog ();
                 return 0;
 
@@ -153,13 +145,7 @@ int main (){
                     break;
                 }
         }
-
-        free (commandline);
-        commandline = (char *)NULL;
     }
-
-    if (commandline)
-        free (commandline);
 
     closelog();
 

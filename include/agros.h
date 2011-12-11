@@ -98,13 +98,9 @@ void    print_help          (config_t* config, char* helparg);
 
 /* Unix shell functions */
 void	get_prompt          (char *prompt, int length, user_t *user);
-char*	read_input          (char *prompt);
+char	*read_input          (int linelength);
 void    parse_command       (char *cmdline, command_t *cmd);
 void    change_directory    (char* path, int loglevel, user_t user);
-void	initialize_readline (config_t *config);
-char*	make_completion	    (char *string);
-char**	cmd_completion	    (const char *text, int start, int end);
-char*	cmd_generator	    (const char *text, int state);
 int     ag_setenv           (char* line);
 int     ag_unsetenv         (char* line);
 void    init_user           (user_t *user);

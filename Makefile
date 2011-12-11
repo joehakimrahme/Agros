@@ -8,7 +8,7 @@ CFLAGS=-Wall -Wextra -Werror
 # Modify the format to suit gcc
 ifdef SYSCONFDIR
     SYSCONF=\"$(SYSCONFDIR)/agros.conf\"
-else 
+else
     SYSCONF=\"$(CURDIR)/agros.conf\"
 endif
 
@@ -20,7 +20,7 @@ endif
 	
 # Default Rule. It all starts here
 agros: $(OBJS)
-	$(CC) $(CFLAGS) -lreadline -o agros $(OBJS)
+	$(CC) $(CFLAGS) -o agros $(OBJS)
 	rm -f $(OBJS)
 	
 # Moves the executable to TARGETDIR if defined
@@ -37,7 +37,7 @@ main.o: agros.o smag_main.o src/main.c include/agros.h include/smags.h
 	$(CC) $(CFLAGS) -c -I include/ src/main.c
 	
 agros.o: smag_main.o src/agros.c include/agros.h include/smags.h
-	$(CC) $(CFLAGS) -c -I include/ -l readline src/agros.c
+	$(CC) $(CFLAGS) -c -I include/ src/agros.c
 
 smag_main.o: src/smag_main.c include/smags.h include/iniparser.h
 ifdef SYSCONF

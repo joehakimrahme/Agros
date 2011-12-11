@@ -16,6 +16,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *    GNU General Public License for more details.
  *
+ e
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,14 +35,6 @@
 #include "smags.h"
 #include "agros.h"
 
-#include <readline/readline.h>
-#include <readline/history.h>
-
-/*
-#ifndef CONFIG_FILE
-#define CONFIG_FILE "agros.conf"
-#endif
-*/
 
 /*
  * A global array holding the associations between each built-in command
@@ -106,28 +99,10 @@ void parse_command (char *cmdline, command_t *cmd){
     cmd->argc = count;
     cmd->name = (char *) malloc (strlen (cmd->argv[0])+1);
     strcpy (cmd->name, cmd->argv[0]);
+
+    free (cmdline);
+    cmdline = (char *)NULL;
 }
-
-/*
- * Reads the input using GNU Readline.
- * Saves each input in a history list.
- * - prompt: The prompt to display when asking for input.
- * The result is dynamically allocated and should
- * be cleaned up with free().
- */
-
-char *read_input (char *prompt)
-{
-    char *result;
-    result  = readline(prompt);
-
-    /* Add the line to the history if it's valid and non-empty */
-    if (result  && *result)
-        add_history(result);
-
-    return result;
-}
-
 
 /*
  * Prints the prompt to the given string.
@@ -362,114 +337,6 @@ void decrease_warnings (config_t* ag_config){
     }
 }
 
-/*
- * Readline functionality
- */
-
-/*
- * Set up autocompletion and history using GNU Readline
- * - config: The AGROS configuration to use when autocompleting.
- */
-inline void initialize_readline(config_t *config)
-{
-    /* Can be used for customization in the future */
-    rl_readline_name = "AGROS";
-
-    /* The function to call before default autocompletion kicks in */
-    rl_attempted_completion_function = cmd_completion;
-
-    /* Get a handle to the list of allowed commands and its length
-     * This allows us to autocomplete these as well.
-     */
-    allowed_list = config->allowed_list;
-    allowed_nbr = config->allowed_nbr;
-}
-
-/*
- * This function is automatically called by GNU Readline
- * when autocompleting.
- * - text: The text the user has entered.
- * - start: An index to the start of the text in the input buffer.
- * - end: An index to the end of the text in the input buffer.
- */
-char **cmd_completion(const char *text, int start, int end)
-{
-    char **matches = (char **)NULL;
-
-    /* Making sure end is used, not really useful for anything */
-    if (end == 0) {
-    ;
-    }
-
-    /*
-     * We're at the beginning of the buffer, so we should match
-     * built-in functions and commands. Otherwise, readline will
-     * automatically match file names
-     */
-    if (start == 0)
-    matches = rl_completion_matches(text, cmd_generator);
-
-    return matches;
-}
-
-/*
- * Dynamically allocates a string and returns a pointer to it.
- * - string: The string to copy into the new location
- */
-inline char *make_completion(char *string)
-{
-    char *result = (char *)NULL;
-    int length= strlen(string) + 1;
-    result = malloc(length);
-    if (result)
-        strncpy(result, string, length);
-
-    return result;
-}
-
-/*
- * Searches built-in functions and allowed commands
- * for matches to currently entered text.
- * - text: The text to match.
- * - state: Indicates the status of the search.
- *   When state is 0, this function is being called
- *   in a new autocompletion, and it should start a
- *   new search.
- */
-char *cmd_generator(const char *text, int state)
-{
-    static int cmd_index;
-    static int allowed_index;
-    static int length;
-
-    char *value = (char *)NULL;
-
-    /* Prepare a new search for matches */
-    if (state == 0) {
-        cmd_index = 0;
-        allowed_index = 0;
-        length = strlen(text);
-    }
-
-    /* Check the list of built-in functions for a match */
-    while (cmd_index < CMD_NBR) {
-        value = my_commands[cmd_index].command_name;
-        cmd_index++;
-        if (strncmp(value, text, length) == 0)
-            return make_completion(value);
-    }
-
-    /* Check the list of allowed commands for a match */
-    while (allowed_index < allowed_nbr) {
-        value = allowed_list[allowed_index];
-        allowed_index++;
-        if (strncmp(value, text, length) == 0)
-            return make_completion(value);
-    }
-
-    /* No matches were found. */
-    return (char *)NULL;
-}
 
 /*
  * line arg should be 'foo=bar'
@@ -518,3 +385,18 @@ inline void init_user (user_t *user)
     user->homedir = pwd->pw_dir;
 }
 
+char *read_input (int linelength){
+    char* CRPosition = NULL;
+    char *cmdline = (char *)malloc (sizeof (char) * linelength);
+
+
+    if (fgets (cmdline, linelength, stdin)){
+        CRPosition = strchr (cmdline, '\n');
+        if (CRPosition)
+            *CRPosition = '\0';
+
+    }else
+        return NULL;
+
+    return cmdline;
+}
