@@ -131,6 +131,10 @@ int main (){
                         if (ag_config.warnings >= 0)    decrease_warnings (&ag_config);
                         if (ag_config.loglevel >= 1)    syslog (LOG_ERR, "Trying to use forbidden command: %s.", cmd.name);
                     }
+
+                    free (commandline);
+                    commandline = (char *)NULL;
+
                     _exit(EXIT_FAILURE);
 
                 }else if (pid < 0){

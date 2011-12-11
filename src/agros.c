@@ -100,8 +100,6 @@ void parse_command (char *cmdline, command_t *cmd){
     cmd->name = (char *) malloc (strlen (cmd->argv[0])+1);
     strcpy (cmd->name, cmd->argv[0]);
 
-    free (cmdline);
-    cmdline = (char *)NULL;
 }
 
 /*
