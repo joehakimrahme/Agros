@@ -151,6 +151,8 @@ void print_help(config_t* config, char* helparg){
         print_allowed (config->allowed_list);
         print_forbidden (config->forbidden_list);
 
+        fprintf(stdout, "\nwarnings left\t%d\n\n", config->warnings);
+
         for (i=0; i<80; i++)
             fprintf (stdout, "*");
 
