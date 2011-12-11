@@ -46,7 +46,7 @@
 built_in_commands my_commands[] = {
     {""         , EMPTY_CMD         , ""},
     {"cd"       , CD_CMD            , "change directory"},
-    {"env"      , ENV_CMD           , "print enviroment."},
+    {"env"      , ENV_CMD           , "print environment"},
     {"exit"     , EXIT_CMD          , "exit from AGROS"},
     {"help"     , HELP_CMD          , "print help"},
     {"set"      , SETENV_CMD        , "modify the environment"},
@@ -125,14 +125,17 @@ void print_help(config_t* config, char* helparg){
 
     if (!strcmp (helparg, "-b")){
 
+        fprintf(stdout, "\n");
         for (i=0; i<CMD_NBR; i++){
 
             if (my_commands[i].command_code != OTHER_CMD
                 && my_commands[i].command_code != EMPTY_CMD)
 
-                fprintf (stdout, "%s\t:%s\n", my_commands[i].command_name,
+                fprintf (stdout, "\t%s\t%s\n", my_commands[i].command_name,
                                               my_commands[i].command_desc);
         }
+
+        fprintf(stdout, "\n");
 
     }else if (!strcmp (helparg, "-a")){
 
@@ -157,6 +160,10 @@ void print_help(config_t* config, char* helparg){
 
         print_allowed (config->allowed_list);
         print_forbidden (config->forbidden_list);
+
+    }else if (!strcmp (helparg, "-w")){
+
+        fprintf(stdout, "warnings left: %d\n", config->warnings);
 
     } else
 
