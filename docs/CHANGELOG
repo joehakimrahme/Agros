@@ -8,9 +8,9 @@ https://github.com/rahmu/Agros
 
 === agros-0.4.0 11/12/2011 ===
     * Replaces GLib by iniparser
-    * Makes "warnings" a mandatory conf 
-    * Makes "allowed" a mandatory conf 
     * Adds set/unset builtins
+    * Makes config "warnings" mandatory
+    * Define command line options for 'help'
 
 
 === agros-0.3.2 01/10/2011 ===

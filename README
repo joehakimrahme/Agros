@@ -66,7 +66,7 @@ Configuration:
         2- Logging commands that returned an error
         3- Logging everything
 
-    - warnings (optional): Sets a number of warnings that decreases every time the user
+    - warnings: Sets a number of warnings that decreases every time the user
                 enters a forbidden command. When warnings reach 0, AGROS exits.
 
 

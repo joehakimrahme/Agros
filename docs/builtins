@@ -1,0 +1,48 @@
+##################################
+#  AGROS - The New Limited Shell #
+##################################
+
+Contact: joe.hakim.rahme@gmail.com
+https://github.com/rahmu/Agros
+
+
+This file will describe the built-in functions that AGROS presents to the user.
+Taken from the builtin help, here's the list of commands:
+
+        help    print help
+        ?       print short help
+
+        cd      change directory
+        exit    exit from AGROS
+
+        env     print environment
+        set     modify the environment
+        unset   unset environment variable
+
+env, set and unset let the user manipulate environment variables. Here's how to
+use them.
+
+$ env [arg]         : if arg is given, AGROS will look for an env variable named arg and
+                      print it to the screen. If it doesn't exist, AGROS will print an
+                      error message. If [arg] is not supplied, AGROS will print all the
+                      enviroment variables.
+
+$ set var=value     : creates an env variable named "var" and sets it to "value". If var
+                      exists, its value is overwritten.
+
+$ unset var         : unsets a given variable. If variable does not exist, nothing happens.
+
+
+
+HELP command
+############
+
+The help command accpets these options:
+
+    -a  print full help
+    -b  print list of built in commands
+    -s  print short help
+    -w  print warnings
+
+* Calling "help" with no option will execute "help -a"
+* Calling "?" will execute "help -s"
