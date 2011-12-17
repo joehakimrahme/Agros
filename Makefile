@@ -19,8 +19,8 @@ endif
 ###########
 	
 # Default Rule. It all starts here
-agros: $(OBJS)
-	$(CC) $(CFLAGS) -o agros $(OBJS)
+ag: $(OBJS)
+	$(CC) $(CFLAGS) -o ag $(OBJS)
 	rm -f $(OBJS)
 	
 # Moves the executable to TARGETDIR if defined
@@ -58,4 +58,4 @@ dictionary.o: src/dictionary.c include/dictionary.h
 .PHONY : clean
 	
 clean:
-	-rm -f agros $(OBJS)
+	-rm -f ag $(OBJS)
