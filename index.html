@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Agros by rahmu</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/rahmu/Agros">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/rahmu/Agros/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/rahmu/Agros/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Agros</h1>
+          <p>Agros is a binary implementation in C of the limited shell (lshell)</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/rahmu">rahmu</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h2>AGROS - The New Limited Shell</h2>
+
+<p>AGROS is my implementation in C of the Limited Shell (lshell). Lshell is a project developed by ghantoos (<a href="mailto:mouzannar@gmail.com">mouzannar@gmail.com</a>). The project consists of a UNIX shell coded in Python, that restricts users to a set of predefined commands. You can find the original project here: <a href="http://lshell.ghantoos.org">http://lshell.ghantoos.org</a>. </p>
+
+<p>AGROS aims at implementing lshell in C. The idea being to get rid of certain limitations of Python, namely: </p>
+
+<ul>
+<li>The availability of the Python interpreter on a machine. </li>
+<li>Versions management. (Lshell does not yet support Python 3)</li>
+<li>Performance issues, most notably on embedded systems. </li>
+</ul><p>This is why AGROS is rightfully named AGROS Got Rid Of the Snake. I'm pretty proud of that name :) AGROS has a submodule called SMAGS, that recently replaced the use of GLib for parsing the conf file. SMAGS is based on the 'iniparser' library written by ndevilla. Here's a link to the original project: <a href="http://ndevilla.free.fr/iniparser/">http://ndevilla.free.fr/iniparser/</a> </p>
+
+<h3>Latest Release:</h3>
+
+<ul>
+<li>Release Name: agros-0.4.0</li>
+<li>Release Date: 11/12/2011 </li>
+</ul><h3>Install:</h3>
+
+<p>You can compile the program by running "make". If the dependencies are present, it will create a binary executable named "agros" that can be directly runnable. If make is called without any arguments, then agros will look for a file called "agros.conf" in the current directory. You can give two command line arguments to <code>make</code>:</p>
+
+<ul>
+<li>SYSCONFDIR: Determines the directory where "agros.conf" is located. <code>make</code> will also copy automatically the conf file to SYSCONFDIR</li>
+<li>TARGETDIR: Determines the directory where the executable will be moved. </li>
+</ul><h3>Configuration:</h3>
+
+<p>There are five variables defined in the agros.conf file.</p>
+
+<ul>
+<li>allowed: Gives a list of the allowed commands separated by a semi-colon ";"</li>
+<li>forbidden: Defines a list of forbidden characters in the command line.</li>
+<li>welcome (optional): Displays a welcome message</li>
+<li>loglevel (optional): Defines the level of log sent to syslog
+
+<ol>
+<li>No logging at all (default)</li>
+<li>Logging only prohibited commands</li>
+<li>Logging commands that returned an error</li>
+<li>Logging everything</li>
+</ol>
+</li>
+<li>warnings: Sets a number of warnings that decreases every time the user enters a forbidden command. When warnings reach 0, AGROS exits. </li>
+</ul><h3>GNU Readline:</h3>
+
+<p>Agros has an experimental version implementing the GNU Readline library for handling user input. It comes with nice features like autocompletion or command history. So far the implementation is still buggy and not very stable. Which is why development is maintained on a separate git branch. Use with caution as there is a high probablity of random crashes. </p>
+
+<h3>Contact</h3>
+
+<p>If you want to contribute to this project, please do not hesitate to send me comments or code patchs at my email adress: Joe "rahmu" HAKIM RAHME <a href="mailto:joe.hakim.rahme@gmail.com">joe.hakim.rahme@gmail.com</a> You can also fork the repository on github.com, and send me pull requests. Here's the repo's URL: <a href="https://github.com/rahmu/Agros">https://github.com/rahmu/Agros</a> </p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
